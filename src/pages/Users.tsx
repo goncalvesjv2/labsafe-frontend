@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IUsers } from "../interfaces/IUsers";
+import { useNavigate } from "react-router-dom";
 
 function Users() {
     const [users, setUsers] = useState<IUsers[]>([]);
@@ -36,13 +37,18 @@ function Users() {
         fetchUsers();
     }, [])
 
+    const navigate = useNavigate();
+    function handleCreate() {
+        navigate("/users/create");
+    }
+
     return (
         <>
             <h1 className="text-title font-bold">Usuários</h1>
             <p className="text-normal text-border font-bold">Gerenciamento de usuários</p>
             <div className="mt-4 flex justify-between">
                 <input type="text" className="border rounded-md border-border p-2 bg-white text-small" placeholder="Buscar e-mail"/>
-                <button className="p-2 bg-primary text-white text-small font-bold rounded-md flex gap-2 items-center">
+                <button onClick={handleCreate} className="p-2 bg-primary text-white text-small font-bold rounded-md flex gap-2 items-center cursor-pointer">
                     <User size={20}/>
                     Novo usuário
                 </button>

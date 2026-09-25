@@ -1,12 +1,13 @@
-import { userRole } from "../utils/user";
+import { getTokenPayload } from "../utils/token";
 import Content from "./Content";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 
 function Main() {
+    const payload = getTokenPayload();
     return (
         <div className="flex">
-            <Sidebar role={userRole.ADMIN}/>
+            <Sidebar role={payload?.role}/>
             <main className="flex-1">
                 <Content>
                     <Outlet />

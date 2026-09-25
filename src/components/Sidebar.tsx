@@ -1,6 +1,6 @@
 import logo from "../assets/logoLabSafe.svg";
 import { Users, User, LayoutDashboard, SquareText, ClipboardList, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userRole, type UserRole } from "../utils/user";
 
 const menuAdmin = [
@@ -71,7 +71,14 @@ function Sidebar({role}: SidebarProps) {
     } else if (role === userRole.ALUNO) {
         menu = menuStudent;
     }
-    
+
+    const navigate = useNavigate();
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        navigate("/login");
+    }
+
     return (
         <aside className="bg-primary h-screen w-3xs flex flex-col justify-between p-4">
             <div className="flex items-center gap-2">
@@ -104,7 +111,7 @@ function Sidebar({role}: SidebarProps) {
                         <p className="text-white text-small">Admin</p>
                     </div>
                 </div>
-                <button className="mt-1 flex gap-1 items-center">
+                <button onClick={handleLogout} className="mt-1 flex gap-1 items-center">
                     <LogOut size={20} className="text-white" />
                     <p className="text-white text-normal">Sair</p>
                 </button>

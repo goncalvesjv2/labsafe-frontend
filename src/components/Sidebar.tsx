@@ -1,6 +1,7 @@
 import logo from "../assets/logoLabSafe.svg";
 import { Users, User, LayoutDashboard, SquareText, ClipboardList, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+import { userRole, type UserRole } from "../utils/user";
 
 const menuAdmin = [
     {
@@ -57,17 +58,17 @@ const menuStudent = [
 ]
 
 interface SidebarProps {
-    role?: string;
+    role?: UserRole;
 }
 
 function Sidebar({role}: SidebarProps) {
     let menu;
 
-    if (role === "ADMIN") {
+    if (role === userRole.ADMIN) {
         menu = menuAdmin;
-    } else if (role === "PROFESSOR") {
+    } else if (role === userRole.PROFESSOR) {
         menu = menuTeacher;
-    } else if (role === "ALUNO") {
+    } else if (role === userRole.ALUNO) {
         menu = menuStudent;
     }
     
@@ -112,4 +113,4 @@ function Sidebar({role}: SidebarProps) {
     )
 }
 
-export default Sidebar
+export default Sidebar;

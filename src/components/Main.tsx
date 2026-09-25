@@ -1,3 +1,4 @@
+import { userRole } from "../utils/user";
 import Content from "./Content";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
@@ -5,7 +6,7 @@ import { Outlet } from "react-router-dom";
 function Main() {
     return (
         <div className="flex">
-            <Sidebar role="PROFESSOR"/>
+            <Sidebar role={userRole.ADMIN}/>
             <main className="flex-1">
                 <Content>
                     <Outlet />

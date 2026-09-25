@@ -83,10 +83,10 @@ function CreateUser() {
                         <input type="password" className="border border-border rounded-md p-2 text-small" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </div>
                     <div className="flex gap-2 justify-center">
-                        <button type="submit" className="bg-primary text-white text-small font-bold p-2 rounded-md">
+                        <button type="submit" className="bg-primary text-white text-small font-bold p-2 rounded-md cursor-pointer">
                             Cadastrar
                         </button>
-                        <button onClick={handleCancel} type="button" className="text-small font-bold text-border border border-border rounded-md p-2">
+                        <button onClick={handleCancel} type="button" className="text-small font-bold text-border border border-border rounded-md p-2 cursor-pointer">
                             Cancelar
                         </button>
                     </div>

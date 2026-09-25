@@ -38,8 +38,13 @@ function Users() {
     }, [])
 
     const navigate = useNavigate();
+    
     function handleCreate() {
         navigate("/users/create");
+    }
+
+    function handleEdit() {
+        navigate("/users/edit/:id")
     }
 
     return (
@@ -74,8 +79,8 @@ function Users() {
                             <td className="text-small p-2">{user.role}</td>
                             <td className="text-small p-2">{user.ativo ? "Ativo" : "Inativo"}</td>
                             <td className="flex gap-2 p-2 text-center justify-center">
-                                <button className="text-small p-2 border rounded-md text-border">Editar</button>
-                                <button className="text-small p-2 border rounded-md text-border">Desativar</button>
+                                <button onClick={handleEdit} className="text-small p-2 border rounded-md text-border cursor-pointer">Editar</button>
+                                <button className="text-small p-2 border rounded-md text-border cursor-pointer">Desativar</button>
                             </td>
                         </tr>
                     ))}

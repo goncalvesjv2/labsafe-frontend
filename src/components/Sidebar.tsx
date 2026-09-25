@@ -111,7 +111,7 @@ function Sidebar({role}: SidebarProps) {
                         <p className="text-white text-small">Admin</p>
                     </div>
                 </div>
-                <button onClick={handleLogout} className="mt-1 flex gap-1 items-center">
+                <button onClick={handleLogout} className="mt-1 flex gap-1 items-center cursor-pointer">
                     <LogOut size={20} className="text-white" />
                     <p className="text-white text-normal">Sair</p>
                 </button>

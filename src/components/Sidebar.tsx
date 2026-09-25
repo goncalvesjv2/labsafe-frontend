@@ -58,10 +58,11 @@ const menuStudent = [
 ]
 
 interface SidebarProps {
-    role?: UserRole;
+    name: string;
+    role: UserRole;
 }
 
-function Sidebar({role}: SidebarProps) {
+function Sidebar({name, role}: SidebarProps) {
     let menu;
 
     if (role === userRole.ADMIN) {
@@ -107,8 +108,8 @@ function Sidebar({role}: SidebarProps) {
                 <div className="flex gap-2 items-center">
                     <div className="h-8 w-8 bg-white rounded-full"></div>
                     <div className="flex flex-col gap-1">
-                        <p className="text-white text-normal font-bold">João Victor</p>
-                        <p className="text-white text-small">Admin</p>
+                        <p className="text-white text-normal font-bold">{name}</p>
+                        <p className="text-white text-small">{role}</p>
                     </div>
                 </div>
                 <button onClick={handleLogout} className="mt-1 flex gap-1 items-center cursor-pointer">

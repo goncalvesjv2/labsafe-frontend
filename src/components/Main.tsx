@@ -5,9 +5,14 @@ import { Outlet } from "react-router-dom";
 
 function Main() {
     const payload = getTokenPayload();
+
+    if(!payload) {
+        return null;
+    }
+
     return (
         <div className="flex">
-            <Sidebar role={payload?.role}/>
+            <Sidebar name={payload.name} role={payload.role}/>
             <main className="flex-1">
                 <Content>
                     <Outlet />

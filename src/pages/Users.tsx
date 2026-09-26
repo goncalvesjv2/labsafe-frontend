@@ -43,8 +43,8 @@ function Users() {
         navigate("/users/create");
     }
 
-    function handleEdit() {
-        navigate("/users/edit/:id")
+    function handleEdit(id: number) {
+        navigate(`/users/edit/${id}`);
     }
 
     return (
@@ -79,7 +79,7 @@ function Users() {
                             <td className="text-small p-2">{user.role}</td>
                             <td className="text-small p-2">{user.ativo ? "Ativo" : "Inativo"}</td>
                             <td className="flex gap-2 p-2 text-center justify-center">
-                                <button onClick={handleEdit} className="text-small p-2 border rounded-md text-border cursor-pointer">Editar</button>
+                                <button onClick={() => handleEdit(user.id)} className="text-small p-2 border rounded-md text-border cursor-pointer">Editar</button>
                                 <button className="text-small p-2 border rounded-md text-border cursor-pointer">Desativar</button>
                             </td>
                         </tr>

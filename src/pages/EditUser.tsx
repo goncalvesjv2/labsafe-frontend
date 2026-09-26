@@ -13,7 +13,12 @@ function EditUser() {
 
     useEffect(() => {
         async function fetchUser() {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`);
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await response.json();
             setName(data.name);
             setEmail(data.email);
@@ -39,11 +44,12 @@ function EditUser() {
                 role, 
                 password
             }
-    
+            const token = localStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(user)
             });

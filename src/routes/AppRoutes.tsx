@@ -6,6 +6,7 @@ import Main from "../components/Main";
 import Users from "../pages/Users";
 import CreateUser from "../pages/CreateUser";
 import EditUser from "../pages/EditUser";
+import AdminRoutes from "./AdminRoutes";
 
 function AppRoutes() {
     return (
@@ -14,9 +15,11 @@ function AppRoutes() {
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />
-                    <Route path="/users" element={<Users />} />
-                    <Route path="/users/create" element={<CreateUser />} />
-                    <Route path="/users/edit/:id" element={<EditUser />} />
+                    <Route element={<AdminRoutes />}>
+                        <Route path="/users" element={<Users />} />
+                        <Route path="/users/create" element={<CreateUser />} />
+                        <Route path="/users/edit/:id" element={<EditUser />} />
+                    </Route>
                 </Route>
             </Route>
         </Routes>

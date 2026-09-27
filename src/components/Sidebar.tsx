@@ -82,7 +82,7 @@ function Sidebar({name, role}: SidebarProps) {
 
     function handleLogout() {
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/");
     }
 
     return (

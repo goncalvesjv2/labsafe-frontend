@@ -1,5 +1,5 @@
 import logo from "../assets/logoLabSafe.svg";
-import { Users, User, LayoutDashboard, SquareText, ClipboardList, LogOut } from "lucide-react";
+import { Users, User, LayoutDashboard, SquareText, ClipboardList, LogOut, FlaskConical } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { userRole, type UserRole } from "../utils/user";
 
@@ -54,6 +54,11 @@ const menuStudent = [
         text: "Perfil",
         path: "/profile",
         icon: User
+    },
+    {
+        text: "Reagentes",
+        path: "/reagents",
+        icon: FlaskConical
     }
 ]
 

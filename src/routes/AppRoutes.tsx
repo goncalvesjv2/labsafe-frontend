@@ -7,6 +7,7 @@ import Users from "../pages/Users";
 import CreateUser from "../pages/CreateUser";
 import EditUser from "../pages/EditUser";
 import AdminRoutes from "./AdminRoutes";
+import Reagent from "../pages/Reagent";
 
 function AppRoutes() {
     return (
@@ -15,6 +16,7 @@ function AppRoutes() {
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />
+                    <Route path="/reagents" element={<Reagent />}/>
                     <Route element={<AdminRoutes />}>
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />

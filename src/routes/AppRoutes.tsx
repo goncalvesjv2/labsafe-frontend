@@ -9,12 +9,14 @@ import EditUser from "../pages/EditUser";
 import AdminRoutes from "./AdminRoutes";
 import Reagent from "../pages/Reagent";
 import Privacy from "../pages/Privacy";
+import Terms from "../pages/Terms";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Login />}/>
             <Route path="/privacy-policies" element={<Privacy />}/>
+            <Route path="/terms-of-use" element={<Terms />}/>
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />

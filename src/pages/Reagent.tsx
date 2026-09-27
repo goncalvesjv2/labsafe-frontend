@@ -41,10 +41,10 @@ function Reagent() {
             {compound && (
                 <div className="flex justify-center">
                     <div className="bg-white rounded-lg p-4 mt-8 flex flex-col gap-4">
-                        <p>CID: {compound.cid}</p>
-                        <p>Nome: {compound.title}</p>
-                        <p>Fórmula molecular: {compound.molecularFormula}</p>
-                        <p>Peso molecular: {compound.molecularWeight}</p>
+                        <p><strong>CID:</strong> {compound.cid}</p>
+                        <p><strong>Nome:</strong> {compound.title}</p>
+                        <p><strong>Fórmula molecular:</strong> {compound.molecularFormula}</p>
+                        <p><strong>Peso molecular:</strong> {compound.molecularWeight}</p>
                     </div>
                 </div>
             )}

@@ -12,7 +12,7 @@ import Reagent from "../pages/Reagent";
 function AppRoutes() {
     return (
         <Routes>
-            <Route path="/login" element={<Login />}/>
+            <Route path="/" element={<Login />}/>
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />

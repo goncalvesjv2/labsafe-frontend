@@ -29,7 +29,7 @@ function AdminRoutes() {
 
 
     if (!token) {
-        return <Navigate to="/login" replace />
+        return <Navigate to="/" replace />
     }
 
     const user = jwtDecode<IPayload>(token);

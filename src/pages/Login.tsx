@@ -10,6 +10,7 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [accepted, setAccepted] = useState(false);
 
     const navigate = useNavigate();
 
@@ -63,10 +64,10 @@ function Login() {
                 </div>
                 {error && <p className="text-red-500 text-small">{error}</p>}
                 <div className="flex gap-2 items-center">
-                    <input className="h-4 w-4" type="checkbox" />
+                    <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>
                     <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
                 </div>
-                <button type="submit" className="bg-primary p-3 rounded-lg text-white text-small font-bold">Entrar</button>
+                <button type="submit" className="bg-primary p-3 rounded-lg text-white text-small font-bold disabled:opacity-60 disabled:cursor-not-allowed" disabled={!accepted}>Entrar</button>
                 <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
             </form>
         </div>

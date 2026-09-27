@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface ILogin {
     email: string;
@@ -62,6 +62,10 @@ function Login() {
                     <input className="border border-border rounded-lg p-2" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
                 </div>
                 {error && <p className="text-red-500 text-small">{error}</p>}
+                <div className="flex gap-2 items-center">
+                    <input className="h-4 w-4" type="checkbox" />
+                    <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
+                </div>
                 <button type="submit" className="bg-primary p-3 rounded-lg text-white text-small font-bold">Entrar</button>
                 <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
             </form>

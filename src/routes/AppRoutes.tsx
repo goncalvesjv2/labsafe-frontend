@@ -8,11 +8,13 @@ import CreateUser from "../pages/CreateUser";
 import EditUser from "../pages/EditUser";
 import AdminRoutes from "./AdminRoutes";
 import Reagent from "../pages/Reagent";
+import Privacy from "../pages/Privacy";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Login />}/>
+            <Route path="/privacy-policies" element={<Privacy />}/>
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />

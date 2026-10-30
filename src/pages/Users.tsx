@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { IUsers } from "../interfaces/IUsers";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import Input from "../components/Input";
 
 function Users() {
     const [users, setUsers] = useState<IUsers[]>([]);
@@ -53,7 +54,7 @@ function Users() {
             <h1 className="text-title font-bold">Usuários</h1>
             <p className="text-normal text-border font-bold">Gerenciamento de usuários</p>
             <div className="mt-4 flex justify-between">
-                <input type="text" className="border rounded-md border-border p-2 bg-white text-small" placeholder="Buscar e-mail"/>
+                <Input placeholder="Buscar e-mail" />
                 <Button onClick={handleCreate}>
                     <User size={20}/>
                     Novo usuário

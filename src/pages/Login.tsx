@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import Input from "../components/Input";
 
 interface ILogin {
     email: string;
@@ -57,11 +58,11 @@ function Login() {
             <form onSubmit={handleSubmit} className="bg-white w-md rounded-lg h-min p-4 flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <label className="text-black text-small">E-mail:</label>
-                    <input className="border border-border rounded-lg p-2" type="text" value={email} onChange={(e) => { setEmail(e.target.value); setError(null);}} />
+                    <Input value={email} onChange={(e) => { setEmail(e.target.value); setError(null); }} />
                 </div>
                 <div className="flex flex-col gap-2">
                     <label className="text-black text-small">Senha:</label>
-                    <input className="border border-border rounded-lg p-2" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
+                    <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
                 </div>
                 {error && <p className="text-red-500 text-small">{error}</p>}
                 <div className="flex gap-2 items-center">

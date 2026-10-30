@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { IPubChem } from "../interfaces/IPubChem";
 import Button from "../components/Button";
+import Input from "../components/Input";
 
 function Reagent() {
     const [reagent, setReagent] = useState("");
@@ -33,7 +34,7 @@ function Reagent() {
         <>
             <h1 className="font-bold text-title">Consultar Reagentes</h1>
             <div className="mt-4 flex justify-between">
-                <input type="text" className="border border-border rounded-md p-2 bg-white" placeholder="Consultar reagente" value={reagent} onChange={(e) => setReagent(e.target.value)} />
+                <Input placeholder="Consultar reagente" value={reagent} onChange={(e) => setReagent(e.target.value)} />
                 <Button onClick={searchReagent}>Consultar</Button>
             </div>
             {loading && <p className="mt-4">Consultando...</p>}

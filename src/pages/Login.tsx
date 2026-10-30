@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 
 interface ILogin {
     email: string;
@@ -67,7 +68,7 @@ function Login() {
                     <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>
                     <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="/terms-of-use">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
                 </div>
-                <button type="submit" className="bg-primary p-3 rounded-lg text-white text-small font-bold disabled:opacity-60 disabled:cursor-not-allowed" disabled={!accepted}>Entrar</button>
+                <Button type="submit" className="w-full" disabled={!accepted}>Entrar</Button>
                 <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
             </form>
         </div>

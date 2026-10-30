@@ -2,6 +2,7 @@ import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IUsers } from "../interfaces/IUsers";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 
 function Users() {
     const [users, setUsers] = useState<IUsers[]>([]);
@@ -53,10 +54,10 @@ function Users() {
             <p className="text-normal text-border font-bold">Gerenciamento de usuários</p>
             <div className="mt-4 flex justify-between">
                 <input type="text" className="border rounded-md border-border p-2 bg-white text-small" placeholder="Buscar e-mail"/>
-                <button onClick={handleCreate} className="p-2 bg-primary text-white text-small font-bold rounded-md flex gap-2 items-center cursor-pointer">
+                <Button onClick={handleCreate}>
                     <User size={20}/>
                     Novo usuário
-                </button>
+                </Button>
             </div>
             {loading && <p className="mt-4 text-small">Carregando usuários...</p>}
 
@@ -79,8 +80,8 @@ function Users() {
                             <td className="text-small p-2">{user.role}</td>
                             <td className="text-small p-2">{user.ativo ? "Ativo" : "Inativo"}</td>
                             <td className="flex gap-2 p-2 text-center justify-center">
-                                <button onClick={() => handleEdit(user.id)} className="text-small p-2 border rounded-md text-border cursor-pointer">Editar</button>
-                                <button className="text-small p-2 border rounded-md text-border cursor-pointer">Desativar</button>
+                                <Button onClick={() => handleEdit(user.id)} variant="secondary">Editar</Button>
+                                <Button variant="secondary">Desativar</Button>
                             </td>
                         </tr>
                     ))}

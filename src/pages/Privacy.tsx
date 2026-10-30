@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Content from "../components/Content";
+import Button from "../components/Button";
 
 function Privacy() {
     const navigate = useNavigate();
@@ -119,7 +120,7 @@ function Privacy() {
                 </section>
             </main>
             <div className="flex justify-center mt-4">
-                <button onClick={handleLogout} className="border border-border text-border font-bold bg-white p-2 rounded-md cursor-pointer">Voltar</button>
+                <Button onClick={handleLogout} variant="secondary" className="bg-white">Voltar</Button>
             </div>
         </Content>
     )

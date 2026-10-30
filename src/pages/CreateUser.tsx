@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 
 function CreateUser() {
     const [name, setName] = useState("");
@@ -85,12 +86,12 @@ function CreateUser() {
                         <input type="password" className="border border-border rounded-md p-2 text-small" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </div>
                     <div className="flex gap-2 justify-center">
-                        <button type="submit" className="bg-primary text-white text-small font-bold p-2 rounded-md cursor-pointer">
+                        <Button type="submit">
                             Cadastrar
-                        </button>
-                        <button onClick={handleCancel} type="button" className="text-small font-bold text-border border border-border rounded-md p-2 cursor-pointer">
+                        </Button>
+                        <Button onClick={handleCancel} variant="secondary">
                             Cancelar
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

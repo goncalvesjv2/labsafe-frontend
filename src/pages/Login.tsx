@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import FormField from "../components/FormField";
 
 interface ILogin {
     email: string;
@@ -56,14 +57,12 @@ function Login() {
     return (
         <div className="h-screen bg-primary flex flex-col justify-center items-center">
             <form onSubmit={handleSubmit} className="bg-white w-md rounded-lg h-min p-4 flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                    <label className="text-black text-small">E-mail:</label>
-                    <Input value={email} onChange={(e) => { setEmail(e.target.value); setError(null); }} />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label className="text-black text-small">Senha:</label>
-                    <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
-                </div>
+                <FormField label="E-mail:" htmlFor="login-email" className="text-black text-small">
+                    <Input id="login-email" value={email} onChange={(e) => { setEmail(e.target.value); setError(null); }} />
+                </FormField>
+                <FormField label="Senha:" htmlFor="login-password" className="text-black text-small">
+                    <Input id="login-password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
+                </FormField>
                 {error && <p className="text-red-500 text-small">{error}</p>}
                 <div className="flex gap-2 items-center">
                     <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>

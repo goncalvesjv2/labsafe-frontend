@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import FormField from "../components/FormField";
 import Card from "../components/Card";
+import Select from "../components/Select";
 
 function CreateUser() {
     const [name, setName] = useState("");
@@ -76,11 +77,11 @@ function CreateUser() {
                             <Input id="create-email" type="email" placeholder="joao@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </FormField>
                         <FormField label="Cargo:" htmlFor="create-role">
-                            <select id="create-role" className="border border-border rounded-md p-2 text-small" value={role} onChange={(e) => setRole(e.target.value)}>
+                            <Select id="create-role" value={role} onChange={(e) => setRole(e.target.value)}>
                                 <option value="Admin">Admin</option>
                                 <option value="Professor(a)">Professor(a)</option>
                                 <option value="Aluno(a)">Aluno(a)</option>
-                            </select>
+                            </Select>
                         </FormField>
                         <FormField label="Senha:" htmlFor="create-password">
                             <Input id="create-password" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />

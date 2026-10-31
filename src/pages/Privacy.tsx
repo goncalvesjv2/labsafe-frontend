@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Content from "../components/Content";
 import Button from "../components/Button";
+import Title from "../components/Title";
 
 function Privacy() {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ function Privacy() {
 
     return (
         <Content>
-            <h1 className="text-center text-title font-bold">Política de Privacidade</h1>
+            <Title className="text-center">Política de Privacidade</Title>
             <main className="flex flex-col gap-2 mt-4">
                 <section>
                     <h2 className="font-bold my-2">1. Quem é responsável pelos dados</h2>

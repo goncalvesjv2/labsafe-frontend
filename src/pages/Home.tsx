@@ -1,6 +1,8 @@
+import Title from "../components/Title";
+
 function Home() {
     return (
-        <h1 className="text-title font-bold">Página Home</h1>   
+        <Title>Página Home</Title>
     )
 }
 

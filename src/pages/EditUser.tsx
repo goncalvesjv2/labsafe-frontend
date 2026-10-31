@@ -5,6 +5,7 @@ import Input from "../components/Input";
 import FormField from "../components/FormField";
 import Card from "../components/Card";
 import Select from "../components/Select";
+import Title from "../components/Title";
 
 function EditUser() {
     const navigate = useNavigate();
@@ -74,7 +75,7 @@ function EditUser() {
 
     return (
         <>
-            <h1 className="text-title font-bold">Editar usuário</h1>
+            <Title>Editar usuário</Title>
             {message && <p className="text-small text-green-600 text-center mt-4">{message}</p>}
             
             {error && <p className="text-small text-red-500 text-center mt-4">{error}</p>}

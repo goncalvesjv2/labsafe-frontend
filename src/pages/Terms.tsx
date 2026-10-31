@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Content from "../components/Content";
 import Button from "../components/Button";
+import Title from "../components/Title";
 
 function Terms() {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ function Terms() {
     
     return (
         <Content>
-            <h1 className="text-title font-bold text-center">Termos de Uso</h1>
+            <Title className="text-center">Termos de Uso</Title>
             <main className="flex flex-col gap-2">
                 <section>
                     <h2 className="font-bold my-2">1. Sobre o LabSafe</h2>

@@ -3,6 +3,7 @@ import type { IPubChem } from "../interfaces/IPubChem";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Card from "../components/Card";
+import Title from "../components/Title";
 
 function Reagent() {
     const [reagent, setReagent] = useState("");
@@ -33,7 +34,7 @@ function Reagent() {
 
     return (
         <>
-            <h1 className="font-bold text-title">Consultar Reagentes</h1>
+            <Title>Consultar Reagentes</Title>
             <div className="mt-4 flex justify-between">
                 <Input placeholder="Consultar reagente" value={reagent} onChange={(e) => setReagent(e.target.value)} />
                 <Button onClick={searchReagent}>Consultar</Button>

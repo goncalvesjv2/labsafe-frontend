@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import FormField from "../components/FormField";
+import Card from "../components/Card";
 
 function EditUser() {
     const navigate = useNavigate();
@@ -77,32 +78,34 @@ function EditUser() {
             
             {error && <p className="text-small text-red-500 text-center mt-4">{error}</p>}
             <div className="flex justify-center mt-8">
-                <form onSubmit={handleSubmit} className="bg-white w-md rounded-lg p-4 flex flex-col gap-4">
-                    <FormField label="Nome:" htmlFor="edit-name">
-                        <Input id="edit-name" placeholder="João" value={name} onChange={(e) => setName(e.target.value)} />
-                    </FormField>
-                    <FormField label="E-mail:" htmlFor="edit-email">
-                        <Input id="edit-email" type="email" placeholder="joao@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    </FormField>
-                    <FormField label="Cargo:" htmlFor="edit-role">
-                        <select id="edit-role" className="border border-border rounded-md p-2 text-small" value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option value="Admin">Admin</option>
-                            <option value="Professor(a)">Professor(a)</option>
-                            <option value="Aluno(a)">Aluno(a)</option>
-                        </select>
-                    </FormField>
-                    <FormField label="Senha:" htmlFor="edit-password">
-                        <Input id="edit-password" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    </FormField>
-                    <div className="flex gap-2 justify-center">
-                        <Button type="submit">
-                            Salvar alterações
-                        </Button>
-                        <Button onClick={handleCancel} variant="secondary">
-                            Cancelar
-                        </Button>
-                    </div>
-                </form>
+                <Card className="w-md">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <FormField label="Nome:" htmlFor="edit-name">
+                            <Input id="edit-name" placeholder="João" value={name} onChange={(e) => setName(e.target.value)} />
+                        </FormField>
+                        <FormField label="E-mail:" htmlFor="edit-email">
+                            <Input id="edit-email" type="email" placeholder="joao@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </FormField>
+                        <FormField label="Cargo:" htmlFor="edit-role">
+                            <select id="edit-role" className="border border-border rounded-md p-2 text-small" value={role} onChange={(e) => setRole(e.target.value)}>
+                                <option value="Admin">Admin</option>
+                                <option value="Professor(a)">Professor(a)</option>
+                                <option value="Aluno(a)">Aluno(a)</option>
+                            </select>
+                        </FormField>
+                        <FormField label="Senha:" htmlFor="edit-password">
+                            <Input id="edit-password" type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        </FormField>
+                        <div className="flex gap-2 justify-center">
+                            <Button type="submit">
+                                Salvar alterações
+                            </Button>
+                            <Button onClick={handleCancel} variant="secondary">
+                                Cancelar
+                            </Button>
+                        </div>
+                    </form>
+                </Card>
             </div>
         </>
     )

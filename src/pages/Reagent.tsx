@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { IPubChem } from "../interfaces/IPubChem";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import Card from "../components/Card";
 
 function Reagent() {
     const [reagent, setReagent] = useState("");
@@ -42,12 +43,12 @@ function Reagent() {
             
             {compound && (
                 <div className="flex justify-center">
-                    <div className="bg-white rounded-lg p-4 mt-8 flex flex-col gap-4">
+                    <Card className="mt-8 flex flex-col gap-4">
                         <p><strong>CID:</strong> {compound.cid}</p>
                         <p><strong>Nome:</strong> {compound.title}</p>
                         <p><strong>Fórmula molecular:</strong> {compound.molecularFormula}</p>
                         <p><strong>Peso molecular:</strong> {compound.molecularWeight}</p>
-                    </div>
+                    </Card>
                 </div>
             )}
         </>

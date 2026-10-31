@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import FormField from "../components/FormField";
+import Card from "../components/Card";
 
 interface ILogin {
     email: string;
@@ -56,21 +57,23 @@ function Login() {
 
     return (
         <div className="h-screen bg-primary flex flex-col justify-center items-center">
-            <form onSubmit={handleSubmit} className="bg-white w-md rounded-lg h-min p-4 flex flex-col gap-4">
-                <FormField label="E-mail:" htmlFor="login-email" className="text-black text-small">
-                    <Input id="login-email" value={email} onChange={(e) => { setEmail(e.target.value); setError(null); }} />
-                </FormField>
-                <FormField label="Senha:" htmlFor="login-password" className="text-black text-small">
-                    <Input id="login-password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
-                </FormField>
-                {error && <p className="text-red-500 text-small">{error}</p>}
-                <div className="flex gap-2 items-center">
-                    <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>
-                    <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="/terms-of-use">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
-                </div>
-                <Button type="submit" className="w-full" disabled={!accepted}>Entrar</Button>
-                <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
-            </form>
+            <Card className="w-md h-min">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <FormField label="E-mail:" htmlFor="login-email" className="text-black text-small">
+                        <Input id="login-email" value={email} onChange={(e) => { setEmail(e.target.value); setError(null); }} />
+                    </FormField>
+                    <FormField label="Senha:" htmlFor="login-password" className="text-black text-small">
+                        <Input id="login-password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
+                    </FormField>
+                    {error && <p className="text-red-500 text-small">{error}</p>}
+                    <div className="flex gap-2 items-center">
+                        <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>
+                        <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="/terms-of-use">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
+                    </div>
+                    <Button type="submit" className="w-full" disabled={!accepted}>Entrar</Button>
+                    <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
+                </form>
+            </Card>
         </div>
     )
 }

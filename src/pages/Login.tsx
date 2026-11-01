@@ -66,12 +66,12 @@ function Login() {
                         <Input id="login-password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(null); }} />
                     </FormField>
                     {error && <p className="text-red-500 text-small">{error}</p>}
+                    <Link className="text-primary text-normal" to="/forgot-password">Esqueci minha senha</Link>
                     <div className="flex gap-2 items-center">
                         <input className="h-4 w-4" type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)}/>
                         <p className="text-normal">Li e aceito os <Link className="text-primary underline" to="/terms-of-use">Termos de Uso</Link> e <Link className="text-primary underline" to="/privacy-policies">Políticas de Privacidade</Link></p>
                     </div>
                     <Button type="submit" className="w-full" disabled={!accepted}>Entrar</Button>
-                    <p className="text-border text-small">Esqueci minha senha. Entre em contato com administrador.</p>
                 </form>
             </Card>
         </div>

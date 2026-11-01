@@ -10,11 +10,15 @@ import AdminRoutes from "./AdminRoutes";
 import Reagent from "../pages/Reagent";
 import Privacy from "../pages/Privacy";
 import Terms from "../pages/Terms";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Login />}/>
+            <Route path="/forgot-password" element={<ForgotPassword />}/>
+            <Route path="/reset-password" element={<ResetPassword />}/>
             <Route path="/privacy-policies" element={<Privacy />}/>
             <Route path="/terms-of-use" element={<Terms />}/>
             <Route element={<ProtectedRoutes />}>

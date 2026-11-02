@@ -16,6 +16,7 @@ import ContentRoutes from "./ContentRoutes";
 import Content from "../pages/Content";
 import CreateContent from "../pages/CreateContent";
 import TeacherRoutes from "./TeacherRoutes";
+import EditContent from "../pages/EditContent";
 
 function AppRoutes() {
     return (
@@ -38,6 +39,7 @@ function AppRoutes() {
                         <Route path="/contents" element={<Content />} />
                         <Route element={<TeacherRoutes />}>
                             <Route path="/contents/create" element={<CreateContent />} />
+                            <Route path="/contents/edit/:id" element={<EditContent />} />
                         </Route>
                     </Route>
                 </Route>

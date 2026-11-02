@@ -19,6 +19,10 @@ function Content() {
         navigate("/contents/create");
     }
 
+    function handleEdit(id: number) {
+        navigate(`/contents/edit/${id}`);
+    }
+
     useEffect(() => {
         async function fetchContents() {
             try {
@@ -66,10 +70,12 @@ function Content() {
                         <p className="text-normal font-bold break-words">{content.title}</p>
                         <div className="flex flex-wrap gap-2 mt-4">
                             <Button>Acessar</Button>
-                            <Button variant="secondary">
-                                <Pencil size={16} />
-                                Editar
-                            </Button>
+                            {user?.role === userRole.PROFESSOR && content.teacherId === user.sub && (
+                                <Button variant="secondary" onClick={() => handleEdit(content.id)}>
+                                    <Pencil size={16} />
+                                    Editar
+                                </Button>
+                            )}
                             <Button variant="secondary">
                                 <Trash size={16} />
                                 Excluir

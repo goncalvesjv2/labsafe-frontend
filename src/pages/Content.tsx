@@ -8,15 +8,15 @@ function Content() {
         <>
             <Title>Conteúdo</Title>
             <p className="text-normal text-border font-bold">Crie um conteúdo contendo título e descrição</p>
-            <div className="flex justify-end mr-14">
+            <div className="flex justify-end mt-4">
                 <Button>
                     Criar conteúdo
                 </Button>
             </div>
-            <div className="flex gap-4 flex-wrap mt-1">
-                <Card className="mt-4 w-full max-w-xs">
+            <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />
@@ -28,9 +28,9 @@ function Content() {
                         </Button>
                     </div>
                 </Card>
-                <Card className="mt-4 w-full max-w-xs">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />
@@ -42,9 +42,9 @@ function Content() {
                         </Button>
                     </div>
                 </Card>
-                <Card className="mt-4 w-full max-w-xs">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />
@@ -56,9 +56,9 @@ function Content() {
                         </Button>
                     </div>
                 </Card>
-                <Card className="mt-4 w-full max-w-xs">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />
@@ -70,9 +70,9 @@ function Content() {
                         </Button>
                     </div>
                 </Card>
-                <Card className="mt-4 w-full max-w-xs">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />
@@ -84,9 +84,9 @@ function Content() {
                         </Button>
                     </div>
                 </Card>
-                <Card className="mt-4 w-full max-w-xs">
+                <Card className="min-w-0">
                     <p className="text-normal font-bold">Equipamento de Proteção Individual</p>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <Button>Acessar</Button>
                         <Button variant="secondary">
                             <Pencil size={16} />

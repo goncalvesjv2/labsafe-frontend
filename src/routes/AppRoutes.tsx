@@ -14,6 +14,8 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import ContentRoutes from "./ContentRoutes";
 import Content from "../pages/Content";
+import CreateContent from "../pages/CreateContent";
+import TeacherRoutes from "./TeacherRoutes";
 
 function AppRoutes() {
     return (
@@ -34,6 +36,9 @@ function AppRoutes() {
                     </Route>
                     <Route element={<ContentRoutes />}>
                         <Route path="/contents" element={<Content />} />
+                        <Route element={<TeacherRoutes />}>
+                            <Route path="/contents/create" element={<CreateContent />} />
+                        </Route>
                     </Route>
                 </Route>
             </Route>

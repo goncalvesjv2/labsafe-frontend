@@ -4,11 +4,20 @@ import Button from "../components/Button";
 import { Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IContent } from "../interfaces/IContent";
+import { useNavigate } from "react-router-dom";
+import { getTokenPayload } from "../utils/token";
+import { userRole } from "../utils/user";
 
 function Content() {
     const [contents, setContents] = useState<IContent[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const user = getTokenPayload();
+
+    function handleCreate() {
+        navigate("/contents/create");
+    }
 
     useEffect(() => {
         async function fetchContents() {
@@ -39,11 +48,13 @@ function Content() {
         <>
             <Title>Conteúdo</Title>
             <p className="text-normal text-border font-bold">Crie um conteúdo contendo título e descrição</p>
-            <div className="flex justify-end mt-4">
-                <Button>
-                    Criar conteúdo
-                </Button>
-            </div>
+            {user?.role === userRole.PROFESSOR && (
+                <div className="flex justify-end mt-4">
+                    <Button onClick={handleCreate}>
+                        Criar conteúdo
+                    </Button>
+                </div>
+            )}
             {loading && <p role="status" className="mt-4 text-small">Carregando conteúdos...</p>}
             {error && <p role="alert" className="mt-4 text-red-500 text-small">{error}</p>}
             {!loading && !error && contents.length === 0 && (

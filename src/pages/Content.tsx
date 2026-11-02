@@ -12,6 +12,7 @@ function Content() {
     const [contents, setContents] = useState<IContent[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [deleteContent, setDeleteContent] = useState<number | null>(null);
     const navigate = useNavigate();
     const user = getTokenPayload();
 
@@ -21,6 +22,44 @@ function Content() {
 
     function handleEdit(id: number) {
         navigate(`/contents/edit/${id}`);
+    }
+
+    async function handleDelete(content: IContent) {
+        if (deleteContent !== null) {
+            return;
+        }
+
+        if (user?.role !== userRole.PROFESSOR || content.teacherId !== user.sub) {
+            setError("Você pode excluir apenas seus próprios conteúdos.");
+            return;
+        }
+
+        if (!window.confirm(`Deseja excluir o conteúdo "${content.title}"?`)) {
+            return;
+        }
+
+        setError("");
+
+        try {
+            setDeleteContent(content.id);
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contents/${content.id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setContents((currentContents) => currentContents.filter((item) => item.id !== content.id));
+            } else {
+                setError("Não foi possível excluir o conteúdo. Tente novamente.");
+            }
+        } catch {
+            setError("Não foi possível excluir o conteúdo. Tente novamente.");
+        } finally {
+            setDeleteContent(null);
+        }
     }
 
     useEffect(() => {
@@ -71,15 +110,17 @@ function Content() {
                         <div className="flex flex-wrap gap-2 mt-4">
                             <Button>Acessar</Button>
                             {user?.role === userRole.PROFESSOR && content.teacherId === user.sub && (
-                                <Button variant="secondary" onClick={() => handleEdit(content.id)}>
-                                    <Pencil size={16} />
-                                    Editar
-                                </Button>
+                                <>
+                                    <Button variant="secondary" onClick={() => handleEdit(content.id)} disabled={deleteContent === content.id}>
+                                        <Pencil size={16} />
+                                        Editar
+                                    </Button>
+                                    <Button variant="secondary" onClick={() => handleDelete(content)} disabled={deleteContent !== null}>
+                                        <Trash size={16} />
+                                        {deleteContent === content.id ? "Excluindo..." : "Excluir"}
+                                    </Button>
+                                </>
                             )}
-                            <Button variant="secondary">
-                                <Trash size={16} />
-                                Excluir
-                            </Button>
                         </div>
                     </Card>
                 ))}

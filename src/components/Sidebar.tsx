@@ -5,6 +5,11 @@ import { userRole, type UserRole } from "../utils/user";
 
 const menuAdmin = [
     {
+        text: "Dashboard",
+        path: "/dashboard",
+        icon: LayoutDashboard
+    },
+    {
         text: "Usuários",
         path: "/users",
         icon: Users,
@@ -17,11 +22,6 @@ const menuAdmin = [
 ];
 
 const menuTeacher = [
-    {
-        text: "Dashboard",
-        path: "/dashboard",
-        icon: LayoutDashboard
-    },
     {
         text: "Conteúdo",
         path: "/contents",

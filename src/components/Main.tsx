@@ -11,9 +11,9 @@ function Main() {
     }
 
     return (
-        <div className="flex">
+        <div className="flex h-dvh overflow-hidden">
             <Sidebar name={payload.name} role={payload.role}/>
-            <main className="flex-1">
+            <main className="min-w-0 flex-1 overflow-y-auto">
                 <Content>
                     <Outlet />
                 </Content>

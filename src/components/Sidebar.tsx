@@ -86,7 +86,7 @@ function Sidebar({name, role}: SidebarProps) {
     }
 
     return (
-        <aside className="bg-primary h-screen w-3xs flex flex-col justify-between p-4">
+        <aside className="bg-primary h-full w-3xs shrink-0 flex flex-col justify-between p-4">
             <div className="flex items-center gap-2">
                 <img src={logo} className="w-8 h-8" alt="Logo da LabSafe" />
                 <p className="text-white text-title">LabSafe</p>

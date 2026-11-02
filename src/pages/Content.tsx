@@ -24,6 +24,10 @@ function Content() {
         navigate(`/contents/edit/${id}`);
     }
 
+    function handleAccess(id: number) {
+        navigate(`/contents/${id}`);
+    }
+
     async function handleDelete(content: IContent) {
         if (deleteContent !== null) {
             return;
@@ -108,7 +112,7 @@ function Content() {
                     <Card key={content.id} className="min-w-0">
                         <p className="text-normal font-bold break-words">{content.title}</p>
                         <div className="flex flex-wrap gap-2 mt-4">
-                            <Button>Acessar</Button>
+                            <Button onClick={() => handleAccess(content.id)} disabled={deleteContent === content.id}>Acessar</Button>
                             {user?.role === userRole.PROFESSOR && content.teacherId === user.sub && (
                                 <>
                                     <Button variant="secondary" onClick={() => handleEdit(content.id)} disabled={deleteContent === content.id}>

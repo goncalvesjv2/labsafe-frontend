@@ -12,6 +12,8 @@ import Privacy from "../pages/Privacy";
 import Terms from "../pages/Terms";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import ContentRoutes from "./ContentRoutes";
+import Content from "../pages/Content";
 
 function AppRoutes() {
     return (
@@ -29,6 +31,9 @@ function AppRoutes() {
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />
                         <Route path="/users/edit/:id" element={<EditUser />} />
+                    </Route>
+                    <Route element={<ContentRoutes />}>
+                        <Route path="/contents" element={<Content />} />
                     </Route>
                 </Route>
             </Route>

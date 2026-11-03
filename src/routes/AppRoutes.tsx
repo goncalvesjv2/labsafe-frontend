@@ -18,6 +18,7 @@ import CreateContent from "../pages/CreateContent";
 import TeacherRoutes from "./TeacherRoutes";
 import EditContent from "../pages/EditContent";
 import ViewContent from "../pages/ViewContent";
+import StudentRoutes from "./StudentRoutes";
 
 function AppRoutes() {
     return (
@@ -30,7 +31,9 @@ function AppRoutes() {
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />
-                    <Route path="/reagents" element={<Reagent />}/>
+                    <Route element={<StudentRoutes />}>
+                        <Route path="/reagents" element={<Reagent />}/>
+                    </Route>
                     <Route element={<AdminRoutes />}>
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />

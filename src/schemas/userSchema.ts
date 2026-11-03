@@ -8,3 +8,9 @@ export const createUserSchema = z.object({
 });
 
 export type CreateUserFormData = z.infer<typeof createUserSchema>;
+
+export const updateUserSchema = createUserSchema.extend({
+    password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres.").or(z.literal("")),
+});
+
+export type UpdateUserFormData = z.infer<typeof updateUserSchema>;

@@ -7,6 +7,8 @@ import Input from "../components/Input";
 import Title from "../components/Title";
 import type { IContent } from "../interfaces/IContent";
 import { getTokenPayload } from "../utils/token";
+import { z } from "zod";
+import { contentSchema } from "../schemas/contentSchema";
 
 function EditContent() {
     const { id } = useParams();
@@ -14,6 +16,7 @@ function EditContent() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [error, setError] = useState("");
+    const [errors, setErrors] = useState({ title: "", description: "" });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [canEdit, setCanEdit] = useState(false);
@@ -61,14 +64,16 @@ function EditContent() {
         }
 
         setError("");
+        setErrors({ title: "", description: "" });
 
-        const content = {
-            title: title.trim(),
-            description: description.trim()
-        };
+        const result = contentSchema.safeParse({ title, description });
 
-        if (!content.title || !content.description) {
-            setError("Preencha o título e a descrição.");
+        if (!result.success) {
+            const fieldErrors = z.flattenError(result.error).fieldErrors;
+            setErrors({
+                title: fieldErrors.title?.[0] || "",
+                description: fieldErrors.description?.[0] || "",
+            });
             return;
         }
 
@@ -81,7 +86,7 @@ function EditContent() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify(content)
+                body: JSON.stringify(result.data)
             });
 
             if (response.ok) {
@@ -101,14 +106,24 @@ function EditContent() {
             <Title>Editar conteúdo</Title>
             <p className="text-normal text-border font-bold">Atualize o título e a descrição do conteúdo</p>
             <Card className="flex flex-1 flex-col w-full mt-4">
-                <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-4">
+                <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col gap-4">
                     {loading && <p role="status" className="text-small">Carregando conteúdo...</p>}
                     {error && <p role="alert" className="text-small text-red-500">{error}</p>}
                     <FormField className="text-small" label="Título:" htmlFor="content-title">
-                        <Input id="content-title" placeholder="Segurança no laboratório" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={150} required disabled={loading || saving || !canEdit} />
+                        <Input id="content-title" placeholder="Segurança no laboratório" value={title} onChange={(e) => {
+                            setTitle(e.target.value);
+                            setErrors({ ...errors, title: "" });
+                            setError("");
+                        }} maxLength={150} required disabled={loading || saving || !canEdit} />
+                        {errors.title && <p role="alert" className="text-small text-red-500">{errors.title}</p>}
                     </FormField>
                     <FormField className="text-small flex-1" label="Descrição:" htmlFor="content-description">
-                        <textarea id="content-description" placeholder="Escreva o conteúdo aqui" value={description} onChange={(e) => setDescription(e.target.value)} rows={8} className="flex-1 min-h-48 border border-border rounded-md p-2 bg-white text-small" required disabled={loading || saving || !canEdit} />
+                        <textarea id="content-description" placeholder="Escreva o conteúdo aqui" value={description} onChange={(e) => {
+                            setDescription(e.target.value);
+                            setErrors({ ...errors, description: "" });
+                            setError("");
+                        }} rows={8} className="flex-1 min-h-48 border border-border rounded-md p-2 bg-white text-small" required disabled={loading || saving || !canEdit} />
+                        {errors.description && <p role="alert" className="text-small text-red-500">{errors.description}</p>}
                     </FormField>
                     <div className="flex flex-wrap gap-2 justify-end">
                         <Button variant="secondary" onClick={() => navigate("/contents")} disabled={saving}>

@@ -4,19 +4,35 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import Card from "../components/Card";
 import Title from "../components/Title";
+import { z } from "zod";
+import { reagentSchema } from "../schemas/reagentSchema";
 
 function Reagent() {
     const [reagent, setReagent] = useState("");
     const [compound, setCompound] = useState<IPubChem | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [errors, setErrors] = useState({ reagent: "" });
 
     async function searchReagent() {
+        if (loading) {
+            return;
+        }
+
+        setError("");
+        setErrors({ reagent: "" });
+        setCompound(null);
+        const result = reagentSchema.safeParse({ reagent });
+
+        if (!result.success) {
+            const fieldErrors = z.flattenError(result.error).fieldErrors;
+            setErrors({ reagent: fieldErrors.reagent?.[0] || "" });
+            return;
+        }
+
         try {
-            setError("");
-            setCompound(null);
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${reagent}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${encodeURIComponent(result.data.reagent)}`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -25,7 +41,7 @@ function Reagent() {
 
             setCompound(data);
             setReagent("");
-        } catch (error) {
+        } catch {
             setError("Composto não encontrado")
         } finally {
             setLoading(false);
@@ -36,9 +52,14 @@ function Reagent() {
         <>
             <Title>Consultar Reagentes</Title>
             <div className="mt-4 flex justify-between">
-                <Input placeholder="Consultar reagente" value={reagent} onChange={(e) => setReagent(e.target.value)} />
-                <Button onClick={searchReagent}>Consultar</Button>
+                <Input placeholder="Consultar reagente" value={reagent} disabled={loading} onChange={(e) => {
+                    setReagent(e.target.value);
+                    setErrors({ reagent: "" });
+                    setError("");
+                }} />
+                <Button onClick={searchReagent} disabled={loading}>Consultar</Button>
             </div>
+            {errors.reagent && <p role="alert" className="mt-4 text-red-500">{errors.reagent}</p>}
             {loading && <p className="mt-4">Consultando...</p>}
             {error && <p className="mt-4 text-red-500">{error}</p>}
             

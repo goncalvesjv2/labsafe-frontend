@@ -1,37 +1,31 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { IPubChem } from "../interfaces/IPubChem";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Card from "../components/Card";
 import Title from "../components/Title";
-import { z } from "zod";
-import { reagentSchema } from "../schemas/reagentSchema";
+import { reagentSchema, type ReagentFormData } from "../schemas/reagentSchema";
 
 function Reagent() {
-    const [reagent, setReagent] = useState("");
+    const { register, handleSubmit, reset, clearErrors, formState: { errors, isSubmitting } } = useForm<ReagentFormData>({
+        resolver: zodResolver(reagentSchema),
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
+        defaultValues: {
+            reagent: "",
+        },
+    });
+
     const [compound, setCompound] = useState<IPubChem | null>(null);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [errors, setErrors] = useState({ reagent: "" });
 
-    async function searchReagent() {
-        if (loading) {
-            return;
-        }
-
+    async function searchReagent(data: ReagentFormData) {
         setError("");
-        setErrors({ reagent: "" });
         setCompound(null);
-        const result = reagentSchema.safeParse({ reagent });
-
-        if (!result.success) {
-            const fieldErrors = z.flattenError(result.error).fieldErrors;
-            setErrors({ reagent: fieldErrors.reagent?.[0] || "" });
-            return;
-        }
 
         try {
-            setLoading(true);
             const token = localStorage.getItem("token");
 
             if (!token) {
@@ -39,7 +33,7 @@ function Reagent() {
                 return;
             }
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${encodeURIComponent(result.data.reagent)}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${encodeURIComponent(data.reagent)}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -55,29 +49,33 @@ function Reagent() {
                 return;
             }
 
-            const data = await response.json();
-            setCompound(data);
-            setReagent("");
+            const compoundData = await response.json();
+            setCompound(compoundData);
+            reset();
         } catch {
             setError("Não foi possível consultar o reagente. Tente novamente.");
-        } finally {
-            setLoading(false);
         }
+    }
+
+    function handleInvalidSubmit() {
+        setError("");
+        setCompound(null);
     }
 
     return (
         <>
             <Title>Consultar Reagentes</Title>
-            <div className="mt-4 flex justify-between">
-                <Input placeholder="Consultar reagente" value={reagent} disabled={loading} onChange={(e) => {
-                    setReagent(e.target.value);
-                    setErrors({ reagent: "" });
-                    setError("");
-                }} />
-                <Button onClick={searchReagent} disabled={loading}>Consultar</Button>
-            </div>
-            {errors.reagent && <p role="alert" className="mt-4 text-red-500">{errors.reagent}</p>}
-            {loading && <p className="mt-4">Consultando...</p>}
+            <form onSubmit={handleSubmit(searchReagent, handleInvalidSubmit)} noValidate className="mt-4 flex justify-between">
+                <Input placeholder="Consultar reagente" disabled={isSubmitting} {...register("reagent", {
+                    onChange: () => {
+                        clearErrors("reagent");
+                        setError("");
+                    },
+                })} />
+                <Button type="submit" disabled={isSubmitting}>Consultar</Button>
+            </form>
+            {errors.reagent && <p role="alert" className="mt-4 text-red-500">{errors.reagent.message}</p>}
+            {isSubmitting && <p className="mt-4">Consultando...</p>}
             {error && <p className="mt-4 text-red-500">{error}</p>}
             
             {compound && (

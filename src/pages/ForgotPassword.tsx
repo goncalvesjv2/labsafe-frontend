@@ -1,49 +1,50 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Card from "../components/Card";
 import Title from "../components/Title";
 import FormField from "../components/FormField";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { z } from "zod";
-import { forgotPasswordSchema } from "../schemas/passwordSchema";
+import { forgotPasswordSchema, type ForgotPasswordFormData } from "../schemas/passwordSchema";
 
 function ForgotPassword() {
-    const [email, setEmail] = useState("");
+    const { register, handleSubmit, clearErrors, formState: { errors } } = useForm<ForgotPasswordFormData>({
+        resolver: zodResolver(forgotPasswordSchema),
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
+        defaultValues: {
+            email: "",
+        },
+    });
+
     const [message, setMessage] = useState("");
-    const [errors, setErrors] = useState({ email: "" });
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setMessage("");
-        setErrors({ email: "" });
-
-        const result = forgotPasswordSchema.safeParse({ email });
-
-        if (!result.success) {
-            const fieldErrors = z.flattenError(result.error).fieldErrors;
-            setErrors({ email: fieldErrors.email?.[0] || "" });
-            return;
-        }
-
+    function handleForgotPassword() {
         setMessage("A recuperação de senha ainda não está disponível. Tente novamente mais tarde.");
+    }
+
+    function handleInvalidSubmit() {
+        setMessage("");
     }
 
     return (
         <div className="min-h-screen bg-primary flex items-center justify-center p-4">
             <Card className="w-full max-w-md">
-                <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit(handleForgotPassword, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                     <Title className="text-center">Esqueci minha senha</Title>
                     <p className="text-small text-border text-center">
                         Informe seu e-mail cadastrado para solicitar um link de recuperação.
                     </p>
                     <FormField label="E-mail:" htmlFor="forgot-email" className="text-small">
-                        <Input id="forgot-email" name="email" type="email" autoComplete="email" placeholder="seu@email.com" required value={email} onChange={(event) => {
-                            setEmail(event.target.value);
-                            setErrors({ email: "" });
-                            setMessage("");
-                        }} />
-                        {errors.email && <p role="alert" className="text-small text-red-500">{errors.email}</p>}
+                        <Input id="forgot-email" type="email" autoComplete="email" placeholder="seu@email.com" required {...register("email", {
+                            onChange: () => {
+                                clearErrors("email");
+                                setMessage("");
+                            },
+                        })} />
+                        {errors.email && <p role="alert" className="text-small text-red-500">{errors.email.message}</p>}
                     </FormField>
                     {message && <p role="status" className="text-small text-border">{message}</p>}
                     <Button type="submit" className="w-full">Enviar</Button>

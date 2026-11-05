@@ -1,6 +1,6 @@
-import type { SelectHTMLAttributes } from "react";
+import type { ComponentPropsWithRef } from "react";
 
-type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
+type SelectProps = ComponentPropsWithRef<"select">;
 
 function Select({className = "", children, ...props}: SelectProps) {
     return (

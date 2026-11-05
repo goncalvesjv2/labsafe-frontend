@@ -32,17 +32,34 @@ function Reagent() {
 
         try {
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${encodeURIComponent(result.data.reagent)}`);
-            const data = await response.json();
+            const token = localStorage.getItem("token");
 
-            if (!response.ok) {
-                throw new Error("Composto não encontrado")
+            if (!token) {
+                setError("Faça login novamente para consultar reagentes.");
+                return;
             }
 
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compounds/${encodeURIComponent(result.data.reagent)}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const messages: Record<number, string> = {
+                    401: "Sessão expirada ou inválida. Faça login novamente.",
+                    403: "Você não tem permissão para consultar reagentes.",
+                    404: "Composto não encontrado."
+                };
+                setError(messages[response.status] ?? "Não foi possível consultar o reagente. Tente novamente.");
+                return;
+            }
+
+            const data = await response.json();
             setCompound(data);
             setReagent("");
         } catch {
-            setError("Composto não encontrado")
+            setError("Não foi possível consultar o reagente. Tente novamente.");
         } finally {
             setLoading(false);
         }

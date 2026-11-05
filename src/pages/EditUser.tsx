@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import FormField from "../components/FormField";
@@ -7,9 +9,18 @@ import Card from "../components/Card";
 import Select from "../components/Select";
 import Title from "../components/Title";
 import { z } from "zod";
-import { updateUserSchema } from "../schemas/userSchema";
+import { updateUserSchema, type UpdateUserFormData } from "../schemas/userSchema";
 
 function EditUser() {
+    useForm<UpdateUserFormData>({
+        resolver: zodResolver(updateUserSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: "",
+        },
+    });
+
     const navigate = useNavigate();
     const { id } = useParams();
     const [name, setName] = useState("");

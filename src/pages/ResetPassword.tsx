@@ -1,51 +1,58 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Card from "../components/Card";
 import Title from "../components/Title";
 import FormField from "../components/FormField";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { z } from "zod";
-import { resetPasswordSchema } from "../schemas/passwordSchema";
+import { resetPasswordSchema, type ResetPasswordFormData } from "../schemas/passwordSchema";
 
 function ResetPassword() {
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const { register, handleSubmit, clearErrors, formState: { errors } } = useForm<ResetPasswordFormData>({
+        resolver: zodResolver(resetPasswordSchema),
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
+        defaultValues: {
+            password: "",
+            confirmPassword: "",
+        },
+    });
+
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-    const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token")?.trim();
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+    function handleResetPassword() {
         setError("");
         setMessage("");
-        setErrors({ password: "", confirmPassword: "" });
 
         if (!token) {
             setError("Abra o link de recuperação recebido no seu e-mail.");
             return;
         }
 
-        const result = resetPasswordSchema.safeParse({ password, confirmPassword });
+        setMessage("A redefinição de senha ainda não está disponível. Tente novamente mais tarde.");
+    }
 
-        if (!result.success) {
-            const fieldErrors = z.flattenError(result.error).fieldErrors;
-            setErrors({
-                password: fieldErrors.password?.[0] || "",
-                confirmPassword: fieldErrors.confirmPassword?.[0] || "",
-            });
+    function handleInvalidSubmit() {
+        setMessage("");
+
+        if (!token) {
+            clearErrors();
+            setError("Abra o link de recuperação recebido no seu e-mail.");
             return;
         }
 
-        setMessage("A redefinição de senha ainda não está disponível. Tente novamente mais tarde.");
+        setError("");
     }
 
     return (
         <div className="min-h-screen bg-primary flex items-center justify-center p-4">
             <Card className="w-full max-w-md">
-                <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit(handleResetPassword, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                     <Title className="text-center">Redefinir senha</Title>
                     <p className="text-small text-border text-center">
                         Crie uma nova senha com pelo menos 8 caracteres.
@@ -56,22 +63,24 @@ function ResetPassword() {
                         </p>
                     )}
                     <FormField label="Nova senha:" htmlFor="reset-password" className="text-small">
-                        <Input id="reset-password" name="password" type="password" autoComplete="new-password" minLength={8} required disabled={!token} value={password} onChange={(event) => {
-                            setPassword(event.target.value);
-                            setErrors({ ...errors, password: "" });
-                            setError("");
-                            setMessage("");
-                        }} />
-                        {errors.password && <p role="alert" className="text-small text-red-500">{errors.password}</p>}
+                        <Input id="reset-password" type="password" autoComplete="new-password" minLength={8} required disabled={!token} {...register("password", {
+                            onChange: () => {
+                                clearErrors("password");
+                                setError("");
+                                setMessage("");
+                            },
+                        })} />
+                        {errors.password && <p role="alert" className="text-small text-red-500">{errors.password.message}</p>}
                     </FormField>
                     <FormField label="Confirmar nova senha:" htmlFor="reset-confirm-password" className="text-small">
-                        <Input id="reset-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required disabled={!token} value={confirmPassword} onChange={(event) => {
-                            setConfirmPassword(event.target.value);
-                            setErrors({ ...errors, confirmPassword: "" });
-                            setError("");
-                            setMessage("");
-                        }} />
-                        {errors.confirmPassword && <p role="alert" className="text-small text-red-500">{errors.confirmPassword}</p>}
+                        <Input id="reset-confirm-password" type="password" autoComplete="new-password" minLength={8} required disabled={!token} {...register("confirmPassword", {
+                            onChange: () => {
+                                clearErrors("confirmPassword");
+                                setError("");
+                                setMessage("");
+                            },
+                        })} />
+                        {errors.confirmPassword && <p role="alert" className="text-small text-red-500">{errors.confirmPassword.message}</p>}
                     </FormField>
                     {error && <p role="alert" className="text-small text-red-500">{error}</p>}
                     {message && <p role="status" className="text-small text-border">{message}</p>}

@@ -12,7 +12,7 @@ import { z } from "zod";
 import { createUserSchema, type CreateUserFormData } from "../schemas/userSchema";
 
 function CreateUser() {
-    useForm<CreateUserFormData>({
+    const { register, getValues, reset } = useForm<CreateUserFormData>({
         resolver: zodResolver(createUserSchema),
         defaultValues: {
             name: "",
@@ -22,10 +22,6 @@ function CreateUser() {
         },
     });
 
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [role, setRole] = useState("Admin");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [errors, setErrors] = useState({ name: "", email: "", role: "", password: "" });
@@ -50,10 +46,7 @@ function CreateUser() {
             }
 
             setMessage("Usuário cadastrado com sucesso")
-            setName("");
-            setEmail("");
-            setRole("Admin");
-            setPassword("");
+            reset();
         } catch (error) {
             console.error(error);
             setError("Ocorreu um erro ao cadastrar usuário");
@@ -66,7 +59,7 @@ function CreateUser() {
         setError("");
         setErrors({ name: "", email: "", role: "", password: "" });
 
-        const result = createUserSchema.safeParse({ name, email, role, password });
+        const result = createUserSchema.safeParse(getValues());
 
         if (!result.success) {
             const fieldErrors = z.flattenError(result.error).fieldErrors;
@@ -96,27 +89,30 @@ function CreateUser() {
                 <Card className="w-md">
                     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
                         <FormField label="Nome:" htmlFor="create-name">
-                            <Input id="create-name" placeholder="João" value={name} onChange={(e) => {
-                                setName(e.target.value);
-                                setErrors({ ...errors, name: "" });
-                                setError("");
-                            }} />
+                            <Input id="create-name" placeholder="João" {...register("name", {
+                                onChange: () => {
+                                    setErrors({ ...errors, name: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name}</p>}
                         </FormField>
                         <FormField label="E-mail:" htmlFor="create-email">
-                            <Input id="create-email" type="email" placeholder="joao@email.com" value={email} onChange={(e) => {
-                                setEmail(e.target.value);
-                                setErrors({ ...errors, email: "" });
-                                setError("");
-                            }} />
+                            <Input id="create-email" type="email" placeholder="joao@email.com" {...register("email", {
+                                onChange: () => {
+                                    setErrors({ ...errors, email: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email}</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="create-role">
-                            <Select id="create-role" value={role} onChange={(e) => {
-                                setRole(e.target.value);
-                                setErrors({ ...errors, role: "" });
-                                setError("");
-                            }}>
+                            <Select id="create-role" {...register("role", {
+                                onChange: () => {
+                                    setErrors({ ...errors, role: "" });
+                                    setError("");
+                                },
+                            })}>
                                 <option value="Admin">Admin</option>
                                 <option value="Professor(a)">Professor(a)</option>
                                 <option value="Aluno(a)">Aluno(a)</option>
@@ -124,11 +120,12 @@ function CreateUser() {
                             {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role}</p>}
                         </FormField>
                         <FormField label="Senha:" htmlFor="create-password">
-                            <Input id="create-password" type="password" placeholder="Senha" value={password} onChange={(e) => {
-                                setPassword(e.target.value);
-                                setErrors({ ...errors, password: "" });
-                                setError("");
-                            }} />
+                            <Input id="create-password" type="password" placeholder="Senha" {...register("password", {
+                                onChange: () => {
+                                    setErrors({ ...errors, password: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password}</p>}
                         </FormField>
                         <div className="flex gap-2 justify-center">

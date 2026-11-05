@@ -1,14 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import FormField from "../components/FormField";
 import Input from "../components/Input";
 import Title from "../components/Title";
 import { z } from "zod";
-import { contentSchema } from "../schemas/contentSchema";
+import { contentSchema, type ContentFormData } from "../schemas/contentSchema";
 
 function CreateContent() {
+    useForm<ContentFormData>({
+        resolver: zodResolver(contentSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+        },
+    });
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [error, setError] = useState("");

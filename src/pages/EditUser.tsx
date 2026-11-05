@@ -11,14 +11,7 @@ import Title from "../components/Title";
 import { updateUserSchema, type UpdateUserFormData } from "../schemas/userSchema";
 
 function EditUser() {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        resetField,
-        clearErrors,
-        formState: { errors, isSubmitting },
-    } = useForm<UpdateUserFormData>({
+    const { register, handleSubmit, reset, resetField, clearErrors, formState: { errors, isSubmitting } } = useForm<UpdateUserFormData>({
         resolver: zodResolver(updateUserSchema),
         mode: "onSubmit",
         reValidateMode: "onSubmit",

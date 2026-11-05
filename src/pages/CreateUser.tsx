@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import FormField from "../components/FormField";
@@ -10,6 +12,16 @@ import { z } from "zod";
 import { createUserSchema, type CreateUserFormData } from "../schemas/userSchema";
 
 function CreateUser() {
+    useForm<CreateUserFormData>({
+        resolver: zodResolver(createUserSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            role: "Admin",
+            password: "",
+        },
+    });
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

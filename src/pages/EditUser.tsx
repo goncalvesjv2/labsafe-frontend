@@ -12,7 +12,7 @@ import { z } from "zod";
 import { updateUserSchema, type UpdateUserFormData } from "../schemas/userSchema";
 
 function EditUser() {
-    useForm<UpdateUserFormData>({
+    const { register, getValues, reset, resetField } = useForm<UpdateUserFormData>({
         resolver: zodResolver(updateUserSchema),
         defaultValues: {
             name: "",
@@ -23,10 +23,6 @@ function EditUser() {
 
     const navigate = useNavigate();
     const { id } = useParams();
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [role, setRole] = useState("");
-    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({ name: "", email: "", role: "", password: "" });
@@ -40,12 +36,15 @@ function EditUser() {
                 }
             });
             const data = await response.json();
-            setName(data.name);
-            setEmail(data.email);
-            setRole(data.role);
+            reset({
+                name: data.name,
+                email: data.email,
+                role: data.role,
+                password: "",
+            });
         }
         fetchUser();
-    }, [id])
+    }, [id, reset])
 
     function handleCancel() {
         navigate("/users");
@@ -57,7 +56,7 @@ function EditUser() {
         setError("");
         setErrors({ name: "", email: "", role: "", password: "" });
 
-        const result = updateUserSchema.safeParse({ name, email, role, password });
+        const result = updateUserSchema.safeParse(getValues());
 
         if (!result.success) {
             const fieldErrors = z.flattenError(result.error).fieldErrors;
@@ -93,7 +92,7 @@ function EditUser() {
             }
     
             setMessage("Usuário atualizado com sucesso")
-            setPassword("");      
+            resetField("password");
         } catch (error) {
             console.error(error);
             setError("Ocorreu um erro ao atualizar usuário");
@@ -110,27 +109,31 @@ function EditUser() {
                 <Card className="w-md">
                     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
                         <FormField label="Nome:" htmlFor="edit-name">
-                            <Input id="edit-name" placeholder="João" value={name} onChange={(e) => {
-                                setName(e.target.value);
-                                setErrors({ ...errors, name: "" });
-                                setError("");
-                            }} />
+                            <Input id="edit-name" placeholder="João" {...register("name", {
+                                onChange: () => {
+                                    setErrors({ ...errors, name: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name}</p>}
                         </FormField>
                         <FormField label="E-mail:" htmlFor="edit-email">
-                            <Input id="edit-email" type="email" placeholder="joao@email.com" value={email} onChange={(e) => {
-                                setEmail(e.target.value);
-                                setErrors({ ...errors, email: "" });
-                                setError("");
-                            }} />
+                            <Input id="edit-email" type="email" placeholder="joao@email.com" {...register("email", {
+                                onChange: () => {
+                                    setErrors({ ...errors, email: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email}</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="edit-role">
-                            <Select id="edit-role" value={role} onChange={(e) => {
-                                setRole(e.target.value);
-                                setErrors({ ...errors, role: "" });
-                                setError("");
-                            }}>
+                            <Select id="edit-role" {...register("role", {
+                                onChange: () => {
+                                    setErrors({ ...errors, role: "" });
+                                    setError("");
+                                },
+                            })}>
+                                <option value="">Selecione um cargo</option>
                                 <option value="Admin">Admin</option>
                                 <option value="Professor(a)">Professor(a)</option>
                                 <option value="Aluno(a)">Aluno(a)</option>
@@ -138,11 +141,12 @@ function EditUser() {
                             {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role}</p>}
                         </FormField>
                         <FormField label="Senha:" htmlFor="edit-password">
-                            <Input id="edit-password" type="password" placeholder="Deixe em branco para manter a senha atual" value={password} onChange={(e) => {
-                                setPassword(e.target.value);
-                                setErrors({ ...errors, password: "" });
-                                setError("");
-                            }} />
+                            <Input id="edit-password" type="password" placeholder="Deixe em branco para manter a senha atual" {...register("password", {
+                                onChange: () => {
+                                    setErrors({ ...errors, password: "" });
+                                    setError("");
+                                },
+                            })} />
                             {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password}</p>}
                         </FormField>
                         <div className="flex gap-2 justify-center">

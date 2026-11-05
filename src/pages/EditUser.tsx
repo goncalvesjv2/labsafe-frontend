@@ -8,12 +8,20 @@ import FormField from "../components/FormField";
 import Card from "../components/Card";
 import Select from "../components/Select";
 import Title from "../components/Title";
-import { z } from "zod";
 import { updateUserSchema, type UpdateUserFormData } from "../schemas/userSchema";
 
 function EditUser() {
-    const { register, getValues, reset, resetField } = useForm<UpdateUserFormData>({
+    const {
+        register,
+        handleSubmit,
+        reset,
+        resetField,
+        clearErrors,
+        formState: { errors, isSubmitting },
+    } = useForm<UpdateUserFormData>({
         resolver: zodResolver(updateUserSchema),
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         defaultValues: {
             name: "",
             email: "",
@@ -25,7 +33,6 @@ function EditUser() {
     const { id } = useParams();
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-    const [errors, setErrors] = useState({ name: "", email: "", role: "", password: "" });
 
     useEffect(() => {
         async function fetchUser() {
@@ -50,31 +57,16 @@ function EditUser() {
         navigate("/users");
     }
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    async function updateUser(userData: UpdateUserFormData) {
         setMessage("");
         setError("");
-        setErrors({ name: "", email: "", role: "", password: "" });
-
-        const result = updateUserSchema.safeParse(getValues());
-
-        if (!result.success) {
-            const fieldErrors = z.flattenError(result.error).fieldErrors;
-            setErrors({
-                name: fieldErrors.name?.[0] || "",
-                email: fieldErrors.email?.[0] || "",
-                role: fieldErrors.role?.[0] || "",
-                password: fieldErrors.password?.[0] || "",
-            });
-            return;
-        }
 
         try {
             const user = {
-                name: result.data.name,
-                email: result.data.email,
-                role: result.data.role,
-                password: result.data.password || undefined,
+                name: userData.name,
+                email: userData.email,
+                role: userData.role,
+                password: userData.password || undefined,
             }
             const token = localStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
@@ -99,6 +91,11 @@ function EditUser() {
         }
     }
 
+    function handleInvalidSubmit() {
+        setMessage("");
+        setError("");
+    }
+
     return (
         <>
             <Title>Editar usuário</Title>
@@ -107,29 +104,29 @@ function EditUser() {
             {error && <p className="text-small text-red-500 text-center mt-4">{error}</p>}
             <div className="flex justify-center mt-8">
                 <Card className="w-md">
-                    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                    <form onSubmit={handleSubmit(updateUser, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                         <FormField label="Nome:" htmlFor="edit-name">
                             <Input id="edit-name" placeholder="João" {...register("name", {
                                 onChange: () => {
-                                    setErrors({ ...errors, name: "" });
+                                    clearErrors("name");
                                     setError("");
                                 },
                             })} />
-                            {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name}</p>}
+                            {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name.message}</p>}
                         </FormField>
                         <FormField label="E-mail:" htmlFor="edit-email">
                             <Input id="edit-email" type="email" placeholder="joao@email.com" {...register("email", {
                                 onChange: () => {
-                                    setErrors({ ...errors, email: "" });
+                                    clearErrors("email");
                                     setError("");
                                 },
                             })} />
-                            {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email}</p>}
+                            {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email.message}</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="edit-role">
                             <Select id="edit-role" {...register("role", {
                                 onChange: () => {
-                                    setErrors({ ...errors, role: "" });
+                                    clearErrors("role");
                                     setError("");
                                 },
                             })}>
@@ -138,22 +135,22 @@ function EditUser() {
                                 <option value="Professor(a)">Professor(a)</option>
                                 <option value="Aluno(a)">Aluno(a)</option>
                             </Select>
-                            {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role}</p>}
+                            {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role.message}</p>}
                         </FormField>
                         <FormField label="Senha:" htmlFor="edit-password">
                             <Input id="edit-password" type="password" placeholder="Deixe em branco para manter a senha atual" {...register("password", {
                                 onChange: () => {
-                                    setErrors({ ...errors, password: "" });
+                                    clearErrors("password");
                                     setError("");
                                 },
                             })} />
-                            {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password}</p>}
+                            {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password.message}</p>}
                         </FormField>
                         <div className="flex gap-2 justify-center">
-                            <Button type="submit">
-                                Salvar alterações
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? "Salvando..." : "Salvar alterações"}
                             </Button>
-                            <Button onClick={handleCancel} variant="secondary">
+                            <Button onClick={handleCancel} variant="secondary" disabled={isSubmitting}>
                                 Cancelar
                             </Button>
                         </div>

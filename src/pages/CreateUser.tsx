@@ -8,12 +8,13 @@ import FormField from "../components/FormField";
 import Card from "../components/Card";
 import Select from "../components/Select";
 import Title from "../components/Title";
-import { z } from "zod";
 import { createUserSchema, type CreateUserFormData } from "../schemas/userSchema";
 
 function CreateUser() {
-    const { register, getValues, reset } = useForm<CreateUserFormData>({
+    const { register, handleSubmit, reset, clearErrors, formState: { errors, isSubmitting } } = useForm<CreateUserFormData>({
         resolver: zodResolver(createUserSchema),
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
         defaultValues: {
             name: "",
             email: "",
@@ -24,7 +25,6 @@ function CreateUser() {
 
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [errors, setErrors] = useState({ name: "", email: "", role: "", password: "" });
 
     async function fetchUser(user: CreateUserFormData) {
         try {
@@ -53,26 +53,9 @@ function CreateUser() {
         }
     }
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    function handleInvalidSubmit() {
         setMessage("");
         setError("");
-        setErrors({ name: "", email: "", role: "", password: "" });
-
-        const result = createUserSchema.safeParse(getValues());
-
-        if (!result.success) {
-            const fieldErrors = z.flattenError(result.error).fieldErrors;
-            setErrors({
-                name: fieldErrors.name?.[0] || "",
-                email: fieldErrors.email?.[0] || "",
-                role: fieldErrors.role?.[0] || "",
-                password: fieldErrors.password?.[0] || "",
-            });
-            return;
-        }
-
-        fetchUser(result.data);
     }
 
     const navigate = useNavigate();
@@ -87,29 +70,29 @@ function CreateUser() {
             {error && <p className="text-small text-red-500 text-center mt-4">{error}</p>}
             <div className="flex justify-center mt-8">
                 <Card className="w-md">
-                    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                    <form onSubmit={handleSubmit(fetchUser, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                         <FormField label="Nome:" htmlFor="create-name">
                             <Input id="create-name" placeholder="João" {...register("name", {
                                 onChange: () => {
-                                    setErrors({ ...errors, name: "" });
+                                    clearErrors("name");
                                     setError("");
                                 },
                             })} />
-                            {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name}</p>}
+                            {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name.message}</p>}
                         </FormField>
                         <FormField label="E-mail:" htmlFor="create-email">
                             <Input id="create-email" type="email" placeholder="joao@email.com" {...register("email", {
                                 onChange: () => {
-                                    setErrors({ ...errors, email: "" });
+                                    clearErrors("email");
                                     setError("");
                                 },
                             })} />
-                            {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email}</p>}
+                            {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email.message}</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="create-role">
                             <Select id="create-role" {...register("role", {
                                 onChange: () => {
-                                    setErrors({ ...errors, role: "" });
+                                    clearErrors("role");
                                     setError("");
                                 },
                             })}>
@@ -117,22 +100,22 @@ function CreateUser() {
                                 <option value="Professor(a)">Professor(a)</option>
                                 <option value="Aluno(a)">Aluno(a)</option>
                             </Select>
-                            {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role}</p>}
+                            {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role.message}</p>}
                         </FormField>
                         <FormField label="Senha:" htmlFor="create-password">
                             <Input id="create-password" type="password" placeholder="Senha" {...register("password", {
                                 onChange: () => {
-                                    setErrors({ ...errors, password: "" });
+                                    clearErrors("password");
                                     setError("");
                                 },
                             })} />
-                            {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password}</p>}
+                            {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password.message}</p>}
                         </FormField>
                         <div className="flex gap-2 justify-center">
-                            <Button type="submit">
-                                Cadastrar
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                             </Button>
-                            <Button onClick={handleCancel} variant="secondary">
+                            <Button onClick={handleCancel} variant="secondary" disabled={isSubmitting}>
                                 Cancelar
                             </Button>
                         </div>

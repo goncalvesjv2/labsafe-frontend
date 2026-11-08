@@ -29,7 +29,7 @@ function EditUser() {
 
     useEffect(() => {
         async function fetchUser() {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -61,7 +61,7 @@ function EditUser() {
                 role: userData.role,
                 password: userData.password || undefined,
             }
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
                 method: 'PATCH',
                 headers: {

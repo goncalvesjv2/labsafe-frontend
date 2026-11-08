@@ -30,7 +30,7 @@ function CreateUser() {
         try {
             setMessage("");
             setError("");
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
                 method: 'POST',
                 headers: {

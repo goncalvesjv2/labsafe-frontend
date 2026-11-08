@@ -26,7 +26,7 @@ function Reagent() {
         setCompound(null);
 
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
 
             if (!token) {
                 setError("Faça login novamente para consultar reagentes.");

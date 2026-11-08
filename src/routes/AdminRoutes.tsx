@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 
 function AdminRoutes() {
     const [checkAcess, setCheckAcess] = useState(true);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     
     useEffect(() => {
         async function registerAcess() {

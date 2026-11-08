@@ -44,8 +44,8 @@ function Privacy() {
                 <p>As informações retornadas pelo PubChem são utilizadas pelo LabSafe apenas para apresentar os dados do composto consultado ao usuário.</p>
             </DocumentSection>
             <DocumentSection title="5. Armazenamento local" contentClassName="mt-4">
-                <p>O LabSafe utiliza o localStorage do navegador para armazenar o token de autenticação utilizado para manter o acesso do usuário à plataforma.</p>
-                <p>Quando o usuário clica em sair, o token armazenado no localStorage é removido, encerrando o acesso autenticado naquele navegador.</p>
+                <p>O LabSafe utiliza o sessionStorage do navegador para armazenar o token de autenticação durante a sessão da aba, mantendo o acesso do usuário à plataforma ao recarregar a página.</p>
+                <p>Quando o usuário clica em sair, o token armazenado no sessionStorage é removido, encerrando o acesso autenticado naquela aba.</p>
                 <p>O LabSafe não utiliza cookies para armazenar o token de autenticação.</p>
             </DocumentSection>
             <DocumentSection title="6. Armazenamento e exclusão de dados" contentClassName="mt-4">
@@ -75,8 +75,8 @@ function Privacy() {
                 </ul>
                 <p>Apesar das medidas adotadas, nenhum sistema pode garantir segurança absoluta contra todos os riscos existentes.</p>
                 <p>Esta Política de Privacidade poderá ser atualizada quando houver alterações no funcionamento da plataforma, no tratamento dos dados ou nas medidas de segurança adotadas.</p>
-                <p><strong>Versão:</strong> 1.0</p>
-                <p><strong>Data da última atualização:</strong> 27/09/2026</p>
+                <p><strong>Versão:</strong> 1.1</p>
+                <p><strong>Data da última atualização:</strong> 08/11/2026</p>
             </DocumentSection>
             <DocumentSection title="9. Contato" contentClassName="mt-4">
                 <p><strong>E-mail:</strong> joaogoncalves3m@gmail.com</p>

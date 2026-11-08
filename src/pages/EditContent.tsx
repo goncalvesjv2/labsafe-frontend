@@ -31,7 +31,7 @@ function EditContent() {
     useEffect(() => {
         async function fetchContent() {
             try {
-                const token = localStorage.getItem("token");
+                const token = sessionStorage.getItem("token");
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contents/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -73,7 +73,7 @@ function EditContent() {
         setError("");
 
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contents/${id}`, {
                 method: "PATCH",
                 headers: {

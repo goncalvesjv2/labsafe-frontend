@@ -20,6 +20,7 @@ import TeacherRoutes from "./TeacherRoutes";
 import EditContent from "../pages/EditContent";
 import ViewContent from "../pages/ViewContent";
 import StudentRoutes from "./StudentRoutes";
+import Quiz from "../pages/Quiz";
 
 function AppRoutes() {
     return (
@@ -42,6 +43,7 @@ function AppRoutes() {
                         <Route path="/users/edit/:id" element={<EditUser />} />
                     </Route>
                     <Route element={<ContentRoutes />}>
+                        <Route path="/quiz" element={<Quiz />} />
                         <Route path="/contents" element={<Content />} />
                         <Route path="/contents/:id" element={<ViewContent />} />
                         <Route element={<TeacherRoutes />}>

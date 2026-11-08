@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
+import Dashboard from "../pages/Dashboard";
 import ProtectedRoutes from "./ProtectedRoutes";
 import Main from "../components/Main";
 import Users from "../pages/Users";
@@ -35,6 +36,7 @@ function AppRoutes() {
                         <Route path="/reagents" element={<Reagent />}/>
                     </Route>
                     <Route element={<AdminRoutes />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />
                         <Route path="/users/edit/:id" element={<EditUser />} />

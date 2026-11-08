@@ -7,6 +7,8 @@ import Input from "../components/Input";
 import FormField from "../components/FormField";
 import Card from "../components/Card";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
+import { getTokenPayload } from "../utils/token";
+import { getDefaultRoute } from "../utils/navigation";
 
 function Login() {
     const { register, handleSubmit, clearErrors, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
@@ -44,8 +46,14 @@ function Login() {
                 throw new Error(data.message);
             }
 
+            const user = getTokenPayload(data.token ?? null);
+
+            if (!user) {
+                throw new Error("Perfil de usuário inválido.");
+            }
+
             sessionStorage.setItem("token", data.token);
-            navigate('/home');
+            navigate(getDefaultRoute(user.role), { replace: true });
         } catch (error) {
             setError((error as Error).message);
         }

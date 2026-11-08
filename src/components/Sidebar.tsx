@@ -1,66 +1,8 @@
 import logo from "../assets/logoLabSafe.svg";
-import { Users, User, LayoutDashboard, SquareText, ClipboardList, LogOut, FlaskConical } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { userRole, type UserRole } from "../utils/user";
-
-const menuAdmin = [
-    {
-        text: "Dashboard",
-        path: "/dashboard",
-        icon: LayoutDashboard
-    },
-    {
-        text: "Usuários",
-        path: "/users",
-        icon: Users,
-    },
-    {
-        text: "Perfil",
-        path: "/profile",
-        icon: User,
-    }
-];
-
-const menuTeacher = [
-    {
-        text: "Conteúdo",
-        path: "/contents",
-        icon: SquareText
-    },
-    {
-        text: "Quiz",
-        path: "/quiz",
-        icon: ClipboardList
-    },
-    {
-        text: "Perfil",
-        path: "/profile",
-        icon: User
-    }
-];
-
-const menuStudent = [
-    {
-        text: "Conteúdo",
-        path: "/contents",
-        icon: SquareText
-    },
-    {
-        text: "Quiz",
-        path: "/quiz",
-        icon: ClipboardList
-    },
-    {
-        text: "Perfil",
-        path: "/profile",
-        icon: User
-    },
-    {
-        text: "Reagentes",
-        path: "/reagents",
-        icon: FlaskConical
-    }
-]
+import type { UserRole } from "../utils/user";
+import { menusByRole } from "../utils/navigation";
 
 interface SidebarProps {
     name: string;
@@ -68,15 +10,7 @@ interface SidebarProps {
 }
 
 function Sidebar({name, role}: SidebarProps) {
-    let menu;
-
-    if (role === userRole.ADMIN) {
-        menu = menuAdmin;
-    } else if (role === userRole.PROFESSOR) {
-        menu = menuTeacher;
-    } else if (role === userRole.ALUNO) {
-        menu = menuStudent;
-    }
+    const menu = menusByRole[role];
 
     const navigate = useNavigate();
 
@@ -94,7 +28,7 @@ function Sidebar({name, role}: SidebarProps) {
 
             <nav>
                 <ul className="text-white flex flex-col gap-8">
-                    {menu?.map((item) => {
+                    {menu.map((item) => {
                         const Icon = item.icon;
 
                         return (

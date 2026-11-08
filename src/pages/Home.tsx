@@ -1,9 +1,11 @@
-import Title from "../components/Title";
+import { Navigate } from "react-router-dom";
+import { getTokenPayload } from "../utils/token";
+import { getDefaultRoute } from "../utils/navigation";
 
 function Home() {
-    return (
-        <Title>Página Home</Title>
-    )
+    const user = getTokenPayload();
+
+    return <Navigate to={user ? getDefaultRoute(user.role) : "/"} replace />;
 }
 
 export default Home;

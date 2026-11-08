@@ -2,9 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import type { IPayload } from "../interfaces/IPayload";
 import { mapUserRole } from "./user.ts";
 
-export function getTokenPayload(): IPayload | null {
-    const token = sessionStorage.getItem("token");
-
+export function getTokenPayload(token: string | null = sessionStorage.getItem("token")): IPayload | null {
     if (!token) {
         return null;
     }

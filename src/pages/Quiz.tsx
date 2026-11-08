@@ -7,6 +7,7 @@ import type { IQuiz } from "../interfaces/IQuiz";
 import type { IContent } from "../interfaces/IContent";
 import { getTokenPayload } from "../utils/token";
 import { userRole } from "../utils/user";
+import { useNavigate } from "react-router-dom";
 
 type QuizWithTitle = IQuiz & { title: string };
 
@@ -16,6 +17,7 @@ function Quiz() {
     const [error, setError] = useState("");
     const user = getTokenPayload();
     const isTeacher = user?.role === userRole.PROFESSOR;
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchQuizzes() {
@@ -59,7 +61,7 @@ function Quiz() {
             <p className="text-normal text-border font-bold">Quizzes vinculados aos conteúdos da plataforma</p>
             {isTeacher && (
                 <div className="flex justify-end mt-4">
-                    <Button disabled title="Cadastro de quizzes em breve">
+                    <Button onClick={() => navigate("/quiz/create")}>
                         Criar quiz
                     </Button>
                 </div>

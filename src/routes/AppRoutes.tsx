@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
+import DashboardRoutes from "./DashboardRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import Main from "../components/Main";
 import Users from "../pages/Users";
@@ -40,8 +41,10 @@ function AppRoutes() {
                     <Route element={<StudentRoutes />}>
                         <Route path="/reagents" element={<Reagent />}/>
                     </Route>
-                    <Route element={<AdminRoutes />}>
+                    <Route element={<DashboardRoutes />}>
                         <Route path="/dashboard" element={<Dashboard />} />
+                    </Route>
+                    <Route element={<AdminRoutes />}>
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />
                         <Route path="/users/edit/:id" element={<EditUser />} />

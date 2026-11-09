@@ -14,6 +14,7 @@ export const menusByRole = {
         { text: "Perfil", path: "/profile", icon: User },
     ],
     [userRole.PROFESSOR]: [
+        { text: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
         { text: "Conteúdo", path: "/contents", icon: SquareText },
         { text: "Quiz", path: "/quiz", icon: ClipboardList },
         { text: "Perfil", path: "/profile", icon: User },

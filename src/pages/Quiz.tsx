@@ -121,7 +121,7 @@ function Quiz() {
                     <Card key={quiz.id} className="min-w-0">
                         <p className="text-normal font-bold break-words">{quiz.title}</p>
                         <div className="flex flex-wrap gap-2 mt-4">
-                            <Button disabled title="Acesso ao quiz em breve">Acessar</Button>
+                            <Button onClick={() => navigate(`/quiz/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>Acessar</Button>
                             {isTeacher && quiz.teacherId === user?.sub && (
                                 <>
                                     <Button variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>

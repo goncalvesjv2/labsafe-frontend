@@ -15,9 +15,54 @@ function Quiz() {
     const [quizzes, setQuizzes] = useState<QuizWithTitle[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [deletingQuizId, setDeletingQuizId] = useState<number | null>(null);
     const user = getTokenPayload();
     const isTeacher = user?.role === userRole.PROFESSOR;
     const navigate = useNavigate();
+
+    async function handleDelete(quiz: QuizWithTitle) {
+        if (deletingQuizId !== null) {
+            return;
+        }
+
+        if (!isTeacher || quiz.teacherId !== user?.sub) {
+            setError("Você pode excluir apenas seus próprios quizzes.");
+            return;
+        }
+
+        if (!window.confirm(`Deseja excluir o quiz "${quiz.title}"? As questões, alternativas e tentativas dos alunos também serão excluídas.`)) {
+            return;
+        }
+
+        setError("");
+
+        try {
+            setDeletingQuizId(quiz.id);
+            const token = sessionStorage.getItem("token");
+
+            if (!token) {
+                setError("Sua sessão terminou. Faça login novamente.");
+                return;
+            }
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quizzes/${quiz.id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                setQuizzes((currentQuizzes) => currentQuizzes.filter((item) => item.id !== quiz.id));
+            } else {
+                setError("Não foi possível excluir o quiz. Tente novamente.");
+            }
+        } catch {
+            setError("Não foi possível excluir o quiz. Tente novamente.");
+        } finally {
+            setDeletingQuizId(null);
+        }
+    }
 
     useEffect(() => {
         async function fetchQuizzes() {
@@ -79,13 +124,13 @@ function Quiz() {
                             <Button disabled title="Acesso ao quiz em breve">Acessar</Button>
                             {isTeacher && quiz.teacherId === user?.sub && (
                                 <>
-                                    <Button variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)}>
+                                    <Button variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
                                         <Pencil size={16} />
                                         Editar
                                     </Button>
-                                    <Button variant="secondary" disabled title="Exclusão de quizzes em breve">
+                                    <Button variant="secondary" onClick={() => handleDelete(quiz)} disabled={deletingQuizId !== null}>
                                         <Trash size={16} />
-                                        Excluir
+                                        {deletingQuizId === quiz.id ? "Excluindo..." : "Excluir"}
                                     </Button>
                                 </>
                             )}

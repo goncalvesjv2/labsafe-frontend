@@ -12,3 +12,7 @@ export interface IQuizResult {
     totalQuestions: number;
     correctCount: number;
 }
+
+export interface IAttemptWithStudent extends IAttempt {
+    studentName: string;
+}

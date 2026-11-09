@@ -24,6 +24,7 @@ import Quiz from "../pages/Quiz";
 import CreateQuiz from "../pages/CreateQuiz";
 import EditQuiz from "../pages/EditQuiz";
 import ViewQuiz from "../pages/ViewQuiz";
+import QuizPerformance from "../pages/QuizPerformance";
 
 function AppRoutes() {
     return (
@@ -51,6 +52,7 @@ function AppRoutes() {
                         <Route path="/contents" element={<Content />} />
                         <Route path="/contents/:id" element={<ViewContent />} />
                         <Route element={<TeacherRoutes />}>
+                            <Route path="/quiz/:id/performance" element={<QuizPerformance />} />
                             <Route path="/quiz/create" element={<CreateQuiz />} />
                             <Route path="/quiz/edit/:id" element={<EditQuiz />} />
                             <Route path="/contents/create" element={<CreateContent />} />

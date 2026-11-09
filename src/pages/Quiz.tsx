@@ -1,7 +1,7 @@
 import Card from "../components/Card";
 import Title from "../components/Title";
 import Button from "../components/Button";
-import { Pencil, Trash } from "lucide-react";
+import { BookOpen, ChartColumn, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IQuiz } from "../interfaces/IQuiz";
 import type { IContent } from "../interfaces/IContent";
@@ -116,21 +116,28 @@ function Quiz() {
             {!loading && !error && quizzes.length === 0 && (
                 <p className="mt-4 text-small">Nenhum quiz cadastrado.</p>
             )}
-            <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className={`gap-4 mt-4 ${isTeacher ? "flex flex-wrap items-start" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"}`}>
                 {quizzes.map((quiz) => (
-                    <Card key={quiz.id} className="min-w-0">
+                    <Card key={quiz.id} className={`@container min-w-0 ${isTeacher ? "w-full max-w-sm" : ""}`}>
                         <p className="text-normal font-bold break-words">{quiz.title}</p>
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            <Button onClick={() => navigate(`/quiz/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>Acessar</Button>
+                        <div className="flex flex-nowrap gap-1 mt-4 whitespace-nowrap">
+                            <Button className="shrink-0 px-1.5" title="Acessar quiz" aria-label="Acessar quiz" onClick={() => navigate(`/quiz/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
+                                <BookOpen size={16} className="@3xs:hidden" />
+                                <span className="hidden @3xs:inline">Acessar</span>
+                            </Button>
                             {isTeacher && quiz.teacherId === user?.sub && (
                                 <>
-                                    <Button variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
-                                        <Pencil size={16} />
-                                        Editar
+                                    <Button className="shrink-0 px-1.5 gap-1!" title="Desempenho" aria-label="Desempenho" variant="secondary" onClick={() => navigate(`/quiz/${quiz.id}/performance`)} disabled={deletingQuizId === quiz.id}>
+                                        <ChartColumn size={16} />
+                                        <span className="hidden @3xs:inline">Desempenho</span>
                                     </Button>
-                                    <Button variant="secondary" onClick={() => handleDelete(quiz)} disabled={deletingQuizId !== null}>
+                                    <Button className="shrink-0 px-1.5 gap-1!" title="Editar quiz" aria-label="Editar quiz" variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
+                                        <Pencil size={16} />
+                                        <span className="hidden @[22rem]:inline">Editar</span>
+                                    </Button>
+                                    <Button className="shrink-0 px-1.5 gap-1!" title={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} aria-label={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} variant="secondary" onClick={() => handleDelete(quiz)} disabled={deletingQuizId !== null}>
                                         <Trash size={16} />
-                                        {deletingQuizId === quiz.id ? "Excluindo..." : "Excluir"}
+                                        <span className="hidden @[22rem]:inline">{deletingQuizId === quiz.id ? "Excluindo..." : "Excluir"}</span>
                                     </Button>
                                 </>
                             )}

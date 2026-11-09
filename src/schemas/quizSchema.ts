@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 const questionSchema = z.object({
+    questionId: z.number().int().positive().optional(),
     statement: z.string().trim().min(1, "Informe o enunciado."),
     alternatives: z.array(z.object({
+        alternativeId: z.number().int().positive().optional(),
         text: z.string().trim().min(1, "Informe o texto da alternativa."),
     })).min(2, "Cadastre pelo menos 2 alternativas.").max(4, "Cadastre no máximo 4 alternativas."),
     correctAlternative: z.string().regex(/^[0-3]$/, "Selecione a alternativa correta."),

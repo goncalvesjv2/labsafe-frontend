@@ -22,6 +22,7 @@ import ViewContent from "../pages/ViewContent";
 import StudentRoutes from "./StudentRoutes";
 import Quiz from "../pages/Quiz";
 import CreateQuiz from "../pages/CreateQuiz";
+import EditQuiz from "../pages/EditQuiz";
 
 function AppRoutes() {
     return (
@@ -49,6 +50,7 @@ function AppRoutes() {
                         <Route path="/contents/:id" element={<ViewContent />} />
                         <Route element={<TeacherRoutes />}>
                             <Route path="/quiz/create" element={<CreateQuiz />} />
+                            <Route path="/quiz/edit/:id" element={<EditQuiz />} />
                             <Route path="/contents/create" element={<CreateContent />} />
                             <Route path="/contents/edit/:id" element={<EditContent />} />
                         </Route>

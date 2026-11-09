@@ -79,7 +79,7 @@ function Quiz() {
                             <Button disabled title="Acesso ao quiz em breve">Acessar</Button>
                             {isTeacher && quiz.teacherId === user?.sub && (
                                 <>
-                                    <Button variant="secondary" disabled title="Edição de quizzes em breve">
+                                    <Button variant="secondary" onClick={() => navigate(`/quiz/edit/${quiz.id}`)}>
                                         <Pencil size={16} />
                                         Editar
                                     </Button>

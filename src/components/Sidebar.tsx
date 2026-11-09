@@ -1,5 +1,5 @@
 import logo from "../assets/logoLabSafe.svg";
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import type { UserRole } from "../utils/user";
 import { menusByRole } from "../utils/navigation";
@@ -45,7 +45,9 @@ function Sidebar({name, role}: SidebarProps) {
             
             <div>
                 <div className="flex gap-2 items-center">
-                    <div className="h-8 w-8 bg-white rounded-full"></div>
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-white rounded-full" aria-hidden="true">
+                        <UserRound size={20} className="text-border" />
+                    </div>
                     <div className="flex flex-col gap-1">
                         <p className="text-white text-normal font-bold">{name}</p>
                         <p className="text-white text-small">{role}</p>

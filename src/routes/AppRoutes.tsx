@@ -26,6 +26,7 @@ import CreateQuiz from "../pages/CreateQuiz";
 import EditQuiz from "../pages/EditQuiz";
 import ViewQuiz from "../pages/ViewQuiz";
 import QuizPerformance from "../pages/QuizPerformance";
+import Profile from "../pages/Profile";
 
 function AppRoutes() {
     return (
@@ -38,6 +39,7 @@ function AppRoutes() {
             <Route element={<ProtectedRoutes />}>
                 <Route element={<Main />}>
                     <Route path="/home" element={<Home/>} />
+                    <Route path="/profile" element={<Profile />} />
                     <Route element={<StudentRoutes />}>
                         <Route path="/reagents" element={<Reagent />}/>
                     </Route>

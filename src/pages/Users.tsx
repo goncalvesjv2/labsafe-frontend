@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import Title from "../components/Title";
+import Status from "../components/Status";
 
 function Users() {
     const [users, setUsers] = useState<IUsers[]>([]);
@@ -80,7 +81,7 @@ function Users() {
                             <td className="text-small p-2">{user.name}</td>
                             <td className="text-small p-2">{user.email}</td>
                             <td className="text-small p-2">{user.role}</td>
-                            <td className="text-small p-2">{user.ativo ? "Ativo" : "Inativo"}</td>
+                            <td className="p-2 text-center align-middle"><Status ativo={user.ativo} /></td>
                             <td className="flex gap-2 p-2 text-center justify-center">
                                 <Button onClick={() => handleEdit(user.id)} variant="secondary">Editar</Button>
                                 <Button variant="secondary">Desativar</Button>

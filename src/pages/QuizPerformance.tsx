@@ -9,12 +9,34 @@ import type { IQuiz } from "../interfaces/IQuiz";
 import { getTokenPayload } from "../utils/token";
 import { userRole } from "../utils/user";
 
+type StudentPerformance = IAttemptWithStudent & { attemptCount: number };
+
+function groupAttemptsByStudent(attempts: IAttemptWithStudent[]): StudentPerformance[] {
+    const sortedAttempts = [...attempts].sort((first, second) => {
+        const dateDifference = new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime();
+        return dateDifference || second.id - first.id;
+    });
+    const students = new Map<number, StudentPerformance>();
+
+    for (const attempt of sortedAttempts) {
+        const student = students.get(attempt.studentId);
+        if (student) {
+            student.attemptCount += 1;
+        } else {
+            students.set(attempt.studentId, { ...attempt, attemptCount: 1 });
+        }
+    }
+
+    return [...students.values()];
+}
+
 function QuizPerformancePage({ id }: { id: number }) {
     const [title, setTitle] = useState("");
     const [attempts, setAttempts] = useState<IAttemptWithStudent[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const studentResults = groupAttemptsByStudent(attempts);
 
     useEffect(() => {
         async function fetchPerformance() {
@@ -64,7 +86,7 @@ function QuizPerformancePage({ id }: { id: number }) {
                 const content: IContent = await contentResponse.json();
                 const attemptsData: IAttemptWithStudent[] = await attemptsResponse.json();
                 setTitle(content.title);
-                setAttempts(attemptsData.sort((first, second) => second.id - first.id));
+                setAttempts(attemptsData);
             } catch (error) {
                 setError(error instanceof Error ? error.message : "Não foi possível carregar o desempenho dos alunos.");
             } finally {
@@ -85,28 +107,28 @@ function QuizPerformancePage({ id }: { id: number }) {
                 {!loading && !error && (
                     <>
                         <h2 className="text-normal font-bold [overflow-wrap:anywhere]">{title}</h2>
-                        {attempts.length === 0 ? (
+                        {studentResults.length === 0 ? (
                             <p role="status" className="text-small">Nenhum aluno respondeu a este quiz ainda.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
                                     <caption className="text-small text-border text-left pb-3">
-                                        Cada linha corresponde a uma tentativa. Os envios mais recentes aparecem primeiro.
+                                        Cada linha corresponde a um aluno. A quantidade inclui todas as tentativas; nota, resultado e data são da tentativa mais recente.
                                     </caption>
                                     <thead>
                                         <tr className="border-b border-background">
                                             <th scope="col" className="text-normal p-2">Aluno</th>
-                                            <th scope="col" className="text-normal p-2">Tentativa</th>
+                                            <th scope="col" className="text-normal p-2">Quantidade de tentativas</th>
                                             <th scope="col" className="text-normal p-2">Nota</th>
                                             <th scope="col" className="text-normal p-2">Resultado</th>
                                             <th scope="col" className="text-normal p-2">Data e hora</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {attempts.map((attempt) => (
-                                            <tr key={attempt.id} className="border-b border-background">
+                                        {studentResults.map((attempt) => (
+                                            <tr key={attempt.studentId} className="border-b border-background">
                                                 <td className="text-small p-2 [overflow-wrap:anywhere]">{attempt.studentName}</td>
-                                                <td className="text-small p-2">#{attempt.id}</td>
+                                                <td className="text-small p-2">{attempt.attemptCount.toLocaleString("pt-BR")}</td>
                                                 <td className="text-small p-2">{attempt.score.toLocaleString("pt-BR")}%</td>
                                                 <td className={`text-small p-2 font-bold ${attempt.approved ? "text-green-700" : "text-red-500"}`}>
                                                     {attempt.approved ? "Aprovado" : "Não aprovado"}

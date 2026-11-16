@@ -19,17 +19,22 @@ function CreateUser() {
             name: "",
             email: "",
             role: "Admin",
-            password: "",
         },
     });
 
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [warning, setWarning] = useState("");
+
+    function clearFeedback() {
+        setMessage("");
+        setError("");
+        setWarning("");
+    }
 
     async function fetchUser(user: CreateUserFormData) {
         try {
-            setMessage("");
-            setError("");
+            clearFeedback();
             const token = sessionStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
                 method: 'POST',
@@ -39,23 +44,25 @@ function CreateUser() {
                 },
                 body: JSON.stringify(user)
             });
-            const data = await response.json();
+            const data: { invitationSent?: boolean; message?: string } = await response.json();
 
             if(!response.ok) {
-                throw new Error(data.message);
+                throw new Error(data.message || "Ocorreu um erro ao cadastrar usuário");
             }
 
-            setMessage("Usuário cadastrado com sucesso")
+            if (data.invitationSent === true) {
+                setMessage("Usuário cadastrado com sucesso. O convite para criar a senha foi enviado por e-mail.");
+            } else {
+                setWarning(data.message || "Usuário cadastrado, mas o envio do e-mail não foi confirmado. Será necessário reenviar o convite.");
+            }
             reset();
         } catch (error) {
-            console.error(error);
-            setError("Ocorreu um erro ao cadastrar usuário");
+            setError(error instanceof Error ? error.message : "Ocorreu um erro ao cadastrar usuário");
         }
     }
 
     function handleInvalidSubmit() {
-        setMessage("");
-        setError("");
+        clearFeedback();
     }
 
     const navigate = useNavigate();
@@ -66,34 +73,36 @@ function CreateUser() {
     return (
         <>
             <Title>Cadastrar usuário</Title>
-            {message && <p className="text-small text-green-600 text-center mt-4">{message}</p>}
-            {error && <p className="text-small text-red-500 text-center mt-4">{error}</p>}
+            <p className="text-normal text-border font-bold">O usuário receberá um convite por e-mail para criar a própria senha.</p>
+            {message && <p role="status" className="text-small text-green-600 text-center mt-4">{message}</p>}
+            {warning && <p role="status" className="text-small text-amber-700 text-center mt-4">{warning}</p>}
+            {error && <p role="alert" className="text-small text-red-500 text-center mt-4">{error}</p>}
             <div className="flex justify-center mt-8">
                 <Card className="w-md">
                     <form onSubmit={handleSubmit(fetchUser, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                         <FormField label="Nome:" htmlFor="create-name">
-                            <Input id="create-name" placeholder="João" {...register("name", {
+                            <Input id="create-name" placeholder="João" disabled={isSubmitting} {...register("name", {
                                 onChange: () => {
                                     clearErrors("name");
-                                    setError("");
+                                    clearFeedback();
                                 },
                             })} />
                             {errors.name && <p role="alert" className="text-red-500 text-small">{errors.name.message}</p>}
                         </FormField>
                         <FormField label="E-mail:" htmlFor="create-email">
-                            <Input id="create-email" type="email" placeholder="joao@email.com" {...register("email", {
+                            <Input id="create-email" type="email" placeholder="joao@email.com" disabled={isSubmitting} {...register("email", {
                                 onChange: () => {
                                     clearErrors("email");
-                                    setError("");
+                                    clearFeedback();
                                 },
                             })} />
                             {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email.message}</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="create-role">
-                            <Select id="create-role" {...register("role", {
+                            <Select id="create-role" disabled={isSubmitting} {...register("role", {
                                 onChange: () => {
                                     clearErrors("role");
-                                    setError("");
+                                    clearFeedback();
                                 },
                             })}>
                                 <option value="Admin">Admin</option>
@@ -101,15 +110,6 @@ function CreateUser() {
                                 <option value="Aluno(a)">Aluno(a)</option>
                             </Select>
                             {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role.message}</p>}
-                        </FormField>
-                        <FormField label="Senha:" htmlFor="create-password">
-                            <Input id="create-password" type="password" placeholder="Senha" {...register("password", {
-                                onChange: () => {
-                                    clearErrors("password");
-                                    setError("");
-                                },
-                            })} />
-                            {errors.password && <p role="alert" className="text-red-500 text-small">{errors.password.message}</p>}
                         </FormField>
                         <div className="flex gap-2 justify-center">
                             <Button type="submit" disabled={isSubmitting}>

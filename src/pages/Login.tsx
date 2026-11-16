@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/Button";
@@ -22,7 +22,10 @@ function Login() {
         },
     });
 
-    const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
+    const [error, setError] = useState<string | null>(() => location.state?.sessionExpired === true
+        ? "Sua sessão terminou. Faça login novamente."
+        : null);
     const navigate = useNavigate();
 
     async function handleLogin(login: LoginFormData) {
@@ -49,7 +52,7 @@ function Login() {
             const user = getTokenPayload(data.token ?? null);
 
             if (!user) {
-                throw new Error("Perfil de usuário inválido.");
+                throw new Error("A sessão recebida é inválida ou expirou. Faça login novamente.");
             }
 
             sessionStorage.setItem("token", data.token);

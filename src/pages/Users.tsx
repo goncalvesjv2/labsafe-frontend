@@ -1,5 +1,5 @@
-import { User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Search, User } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { IUsers } from "../interfaces/IUsers";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
@@ -10,6 +10,7 @@ import { getTokenPayload } from "../utils/token";
 
 function Users() {
     const [users, setUsers] = useState<IUsers[]>([]);
+    const [emailSearch, setEmailSearch] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [updatingIds, setUpdatingIds] = useState<number[]>([]);
@@ -21,6 +22,8 @@ function Users() {
         }
     });
     const navigate = useNavigate();
+    const searchTerm = emailSearch.trim().toLowerCase();
+    const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(searchTerm));
 
     useEffect(() => {
         async function fetchUsers() {
@@ -121,12 +124,22 @@ function Users() {
         navigate(`/users/edit/${id}`);
     }
 
+    function handleSearch(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setEmailSearch(emailSearch.trim());
+    }
+
     return (
         <>
             <Title>Usuários</Title>
             <p className="text-normal text-border font-bold">Gerenciamento de usuários</p>
-            <div className="mt-4 flex justify-between">
-                <Input placeholder="Buscar e-mail" />
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <form onSubmit={handleSearch} role="search" aria-label="Buscar usuários por e-mail" className="flex min-w-0 items-center gap-2">
+                    <Input type="search" placeholder="Buscar e-mail" aria-label="E-mail do usuário" value={emailSearch} onChange={(event) => setEmailSearch(event.target.value)} className="h-9 min-w-0" />
+                    <Button type="submit" aria-label="Buscar e-mail" title="Buscar e-mail" className="h-9 w-9 shrink-0 p-2">
+                        <Search size={18} aria-hidden="true" />
+                    </Button>
+                </form>
                 <Button onClick={handleCreate}>
                     <User size={20}/>
                     Novo usuário
@@ -145,7 +158,14 @@ function Users() {
                     </tr>
                 </thead>
                 <tbody className="text-center">
-                    {users.map((user) => {
+                    {!loading && !error && filteredUsers.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="p-4 text-small">
+                                <p role="status">{users.length === 0 ? "Nenhum usuário cadastrado." : "Nenhum usuário encontrado."}</p>
+                            </td>
+                        </tr>
+                    )}
+                    {filteredUsers.map((user) => {
                         const isUpdating = updatingIds.includes(user.id);
                         const cannotDeactivate = user.id === loggedUserId && user.ativo;
 

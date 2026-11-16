@@ -13,7 +13,7 @@ import type { IUsers } from "../interfaces/IUsers";
 import { mapUserRole } from "../utils/user";
 
 function EditUserForm({ id }: { id: number }) {
-    const { register, control, handleSubmit, reset, clearErrors, formState: { errors, isSubmitting } } = useForm<UpdateUserFormData>({
+    const { register, control, handleSubmit, reset, clearErrors, formState: { errors, isSubmitting, isDirty } } = useForm<UpdateUserFormData>({
         resolver: zodResolver(updateUserSchema),
         mode: "onSubmit",
         reValidateMode: "onSubmit",
@@ -28,10 +28,13 @@ function EditUserForm({ id }: { id: number }) {
     const [message, setMessage] = useState("");
     const [warning, setWarning] = useState("");
     const [loading, setLoading] = useState(true);
+    const [resending, setResending] = useState(false);
+    const [userActive, setUserActive] = useState(false);
     const [savedEmail, setSavedEmail] = useState<string | null>(null);
     const email = useWatch({ control, name: "email" });
     const emailChanged = savedEmail !== null && email.trim().toLowerCase() !== savedEmail.trim().toLowerCase();
-    const disabled = loading || isSubmitting || savedEmail === null;
+    const disabled = loading || isSubmitting || resending || savedEmail === null;
+    const canResend = !disabled && !isDirty && userActive;
 
     function clearFeedback() {
         setMessage("");
@@ -63,6 +66,7 @@ function EditUserForm({ id }: { id: number }) {
 
                 reset({ name: data.name, email: data.email, role });
                 setSavedEmail(data.email);
+                setUserActive(data.ativo);
             } catch (error) {
                 if (active) setError(error instanceof Error ? error.message : "Não foi possível carregar o usuário.");
             } finally {
@@ -78,7 +82,7 @@ function EditUserForm({ id }: { id: number }) {
     }
 
     async function updateUser(userData: UpdateUserFormData) {
-        if (loading || savedEmail === null) return;
+        if (loading || resending || savedEmail === null) return;
         clearFeedback();
 
         try {
@@ -110,12 +114,47 @@ function EditUserForm({ id }: { id: number }) {
                 role: mapUserRole(data?.role) ?? userData.role,
             });
             setSavedEmail(updatedEmail);
+            if (typeof data?.ativo === "boolean") setUserActive(data.ativo);
             setMessage("Usuário atualizado com sucesso.");
             if (changedEmail) {
                 setWarning("E-mail alterado. Se o usuário ainda não criou a senha, será necessário reenviar o convite para o novo endereço.");
             }
         } catch (error) {
             setError(error instanceof Error ? error.message : "Ocorreu um erro ao atualizar usuário");
+        }
+    }
+
+    async function handleResendInvitation() {
+        if (!canResend) return;
+        clearFeedback();
+        setResending(true);
+
+        try {
+            const token = sessionStorage.getItem("token");
+            if (!token) throw new Error("Sua sessão terminou. Faça login novamente.");
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}/invitations/resend`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data: { invitationSent?: boolean; message?: string } | null = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                throw new Error(data?.message || "Não foi possível reenviar o convite. Tente novamente.");
+            }
+
+            if (data?.invitationSent !== true) {
+                setWarning(data?.message || "O envio do e-mail não foi confirmado. Tente reenviar o convite.");
+                return;
+            }
+
+            setMessage(`Convite reenviado para ${savedEmail}. O link anterior não é mais válido.`);
+        } catch (error) {
+            setError(error instanceof Error && error.name !== "TypeError"
+                ? error.message
+                : "Não foi possível conectar ao servidor. Tente novamente.");
+        } finally {
+            setResending(false);
         }
     }
 
@@ -168,11 +207,16 @@ function EditUserForm({ id }: { id: number }) {
                             </Select>
                             {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role.message}</p>}
                         </FormField>
-                        <div className="flex gap-2 justify-center">
-                            <Button type="submit" disabled={disabled}>
+                        {isDirty && !emailChanged && <p role="status" className="text-small text-amber-700">Salve as alterações antes de reenviar o convite.</p>}
+                        <p className="text-small text-border">Convites podem ser reenviados apenas para contas ativas que ainda não definiram a senha.</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button type="submit" disabled={disabled} className="w-full">
                                 {isSubmitting ? "Salvando..." : "Salvar alterações"}
                             </Button>
-                            <Button onClick={handleCancel} variant="secondary" disabled={isSubmitting}>
+                            <Button onClick={handleResendInvitation} variant="secondary" disabled={!canResend} className="w-full">
+                                {resending ? "Reenviando..." : "Reenviar convite"}
+                            </Button>
+                            <Button onClick={handleCancel} variant="secondary" disabled={isSubmitting || resending} className="col-span-2 w-full">
                                 Cancelar
                             </Button>
                         </div>

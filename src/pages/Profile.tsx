@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
-import { UserRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Trash, UserRound } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 import Card from "../components/Card";
 import Title from "../components/Title";
 import type { IUsers } from "../interfaces/IUsers";
-import { mapUserRole } from "../utils/user";
+import { mapUserRole, userRole } from "../utils/user";
+import { getTokenPayload } from "../utils/token";
 
 function Profile({ userId }: { userId?: number }) {
     const [profile, setProfile] = useState<IUsers | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [deleteError, setDeleteError] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const deleteInProgress = useRef(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         let active = true;
@@ -59,6 +66,64 @@ function Profile({ userId }: { userId?: number }) {
     }, [userId]);
 
     const role = profile ? mapUserRole(profile.role) ?? profile.role : "";
+    const loggedUser = getTokenPayload();
+    const canDeleteAccount = userId === undefined && !loading && !error && profile !== null
+        && profile.id === loggedUser?.sub
+        && (role === userRole.PROFESSOR || role === userRole.ALUNO)
+        && (loggedUser.role === userRole.PROFESSOR || loggedUser.role === userRole.ALUNO);
+
+    async function handleDeleteAccount() {
+        if (!canDeleteAccount || deleteInProgress.current) return;
+
+        if (!window.confirm("Deseja excluir permanentemente sua conta do LabSafe? Você perderá o acesso à plataforma. Essa ação não pode ser desfeita.")) {
+            return;
+        }
+
+        deleteInProgress.current = true;
+        setDeleting(true);
+        setDeleteError("");
+
+        try {
+            const token = sessionStorage.getItem("token");
+            const currentUser = getTokenPayload(token);
+
+            if (!currentUser || currentUser.sub !== profile?.id) {
+                sessionStorage.removeItem("token");
+                navigate("/", { replace: true });
+                return;
+            }
+
+            if (currentUser.role !== userRole.PROFESSOR && currentUser.role !== userRole.ALUNO) {
+                throw new Error("A exclusão da própria conta está disponível apenas para professores e alunos.");
+            }
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (response.status === 401) {
+                sessionStorage.removeItem("token");
+                navigate("/", { replace: true });
+                return;
+            }
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => null);
+                throw new Error(data?.message || "Não foi possível excluir sua conta. Tente novamente.");
+            }
+
+            sessionStorage.removeItem("token");
+            navigate("/", { replace: true });
+        } catch (error) {
+            setDeleteError(error instanceof Error && error.name !== "TypeError"
+                ? error.message
+                : "Não foi possível conectar ao servidor. Tente novamente.");
+        } finally {
+            deleteInProgress.current = false;
+            setDeleting(false);
+        }
+    }
 
     return (
         <>
@@ -92,6 +157,15 @@ function Profile({ userId }: { userId?: number }) {
                     )}
                 </Card>
             </div>
+            {canDeleteAccount && (
+                <div className="mt-4 flex flex-col items-end gap-2">
+                    {deleteError && <p role="alert" className="text-small text-red-600">{deleteError}</p>}
+                    <Button onClick={handleDeleteAccount} disabled={deleting} aria-busy={deleting} className="bg-red-700 hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700">
+                        <Trash size={16} aria-hidden="true" />
+                        {deleting ? "Excluindo conta..." : "Excluir minha conta"}
+                    </Button>
+                </div>
+            )}
         </>
     );
 }

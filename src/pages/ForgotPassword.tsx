@@ -10,7 +10,7 @@ import Button from "../components/Button";
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "../schemas/passwordSchema";
 
 function ForgotPassword() {
-    const { register, handleSubmit, clearErrors, formState: { errors } } = useForm<ForgotPasswordFormData>({
+    const { register, handleSubmit, clearErrors, formState: { errors, isSubmitting } } = useForm<ForgotPasswordFormData>({
         resolver: zodResolver(forgotPasswordSchema),
         mode: "onSubmit",
         reValidateMode: "onSubmit",
@@ -20,34 +20,58 @@ function ForgotPassword() {
     });
 
     const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
 
-    function handleForgotPassword() {
-        setMessage("A recuperação de senha ainda não está disponível. Tente novamente mais tarde.");
+    async function handleForgotPassword(data: ForgotPasswordFormData) {
+        setMessage("");
+        setError("");
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            const result: { message?: string; errors?: { message: string }[] } | null = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                throw new Error(result?.errors?.[0]?.message || result?.message || "Não foi possível solicitar a recuperação de senha. Tente novamente.");
+            }
+
+            setMessage(result?.message || "Se houver uma conta apta à recuperação com esse e-mail, você receberá as instruções.");
+        } catch (error) {
+            setError(error instanceof Error && error.name !== "TypeError"
+                ? error.message
+                : "Não foi possível conectar ao servidor. Tente novamente.");
+        }
     }
 
     function handleInvalidSubmit() {
         setMessage("");
+        setError("");
     }
 
     return (
         <div className="min-h-screen bg-primary flex items-center justify-center p-4">
             <Card className="w-full max-w-md">
-                <form onSubmit={handleSubmit(handleForgotPassword, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit(handleForgotPassword, handleInvalidSubmit)} noValidate aria-busy={isSubmitting} className="flex flex-col gap-4">
                     <Title className="text-center">Esqueci minha senha</Title>
-                    <p className="text-small text-border text-center">
+                    <p className="text-normal text-border font-bold text-center">
                         Informe seu e-mail cadastrado para solicitar um link de recuperação.
                     </p>
                     <FormField label="E-mail:" htmlFor="forgot-email" className="text-small">
-                        <Input id="forgot-email" type="email" autoComplete="email" placeholder="seu@email.com" required {...register("email", {
+                        <Input id="forgot-email" type="email" autoComplete="email" placeholder="seu@email.com" required disabled={isSubmitting} aria-invalid={!!errors.email} aria-describedby={errors.email ? "forgot-email-error" : undefined} {...register("email", {
                             onChange: () => {
                                 clearErrors("email");
                                 setMessage("");
+                                setError("");
                             },
                         })} />
-                        {errors.email && <p role="alert" className="text-small text-red-500">{errors.email.message}</p>}
+                        {errors.email && <p id="forgot-email-error" role="alert" className="text-small text-red-500">{errors.email.message}</p>}
                     </FormField>
                     {message && <p role="status" className="text-small text-border">{message}</p>}
-                    <Button type="submit" className="w-full">Enviar</Button>
+                    {error && <p role="alert" className="text-small text-red-500">{error}</p>}
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>{isSubmitting ? "Enviando..." : "Enviar"}</Button>
                     <Link to="/" className="text-small text-primary underline text-center">
                         Voltar para o login
                     </Link>

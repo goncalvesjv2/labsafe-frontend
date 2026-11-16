@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const forgotPasswordSchema = z.object({
-    email: z.string().trim().pipe(z.email({ error: "Informe um e-mail válido." })),
+    email: z.string().trim().toLowerCase().pipe(z.email({ error: "Informe um e-mail válido." })),
 });
 
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;

@@ -1,6 +1,7 @@
 import Card from "../components/Card";
 import Title from "../components/Title";
 import Button from "../components/Button";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IContent } from "../interfaces/IContent";
@@ -13,6 +14,8 @@ function Content() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [deleteContent, setDeleteContent] = useState<number | null>(null);
+    const [contentToDelete, setContentToDelete] = useState<IContent | null>(null);
+    const [deleteError, setDeleteError] = useState("");
     const navigate = useNavigate();
     const user = getTokenPayload();
 
@@ -34,19 +37,20 @@ function Content() {
         }
 
         if (user?.role !== userRole.PROFESSOR || content.teacherId !== user.sub) {
-            setError("Você pode excluir apenas seus próprios conteúdos.");
-            return;
-        }
-
-        if (!window.confirm(`Deseja excluir o conteúdo "${content.title}"?`)) {
+            setDeleteError("Você pode excluir apenas seus próprios conteúdos.");
             return;
         }
 
         setError("");
+        setDeleteError("");
 
         try {
             setDeleteContent(content.id);
             const token = sessionStorage.getItem("token");
+            if (!token) {
+                setDeleteError("Sua sessão terminou. Faça login novamente.");
+                return;
+            }
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contents/${content.id}`, {
                 method: "DELETE",
                 headers: {
@@ -56,11 +60,12 @@ function Content() {
 
             if (response.ok) {
                 setContents((currentContents) => currentContents.filter((item) => item.id !== content.id));
+                setContentToDelete(null);
             } else {
-                setError("Não foi possível excluir o conteúdo. Tente novamente.");
+                setDeleteError("Não foi possível excluir o conteúdo. Tente novamente.");
             }
         } catch {
-            setError("Não foi possível excluir o conteúdo. Tente novamente.");
+            setDeleteError("Não foi possível excluir o conteúdo. Tente novamente.");
         } finally {
             setDeleteContent(null);
         }
@@ -119,7 +124,7 @@ function Content() {
                                         <Pencil size={16} />
                                         Editar
                                     </Button>
-                                    <Button variant="secondary" onClick={() => handleDelete(content)} disabled={deleteContent !== null}>
+                                    <Button variant="secondary" onClick={() => { setDeleteError(""); setContentToDelete(content); }} disabled={deleteContent !== null}>
                                         <Trash size={16} />
                                         {deleteContent === content.id ? "Excluindo..." : "Excluir"}
                                     </Button>
@@ -129,6 +134,9 @@ function Content() {
                     </Card>
                 ))}
             </div>
+            <ConfirmDialog open={contentToDelete !== null} title="Excluir conteúdo" description={`Deseja excluir o conteúdo "${contentToDelete?.title ?? ""}"? Essa ação não pode ser desfeita.`}
+                confirmLabel="Excluir conteúdo" busy={deleteContent !== null} error={deleteError}
+                onCancel={() => setContentToDelete(null)} onConfirm={async () => { if (contentToDelete) await handleDelete(contentToDelete); }} />
         </>
     )
 }

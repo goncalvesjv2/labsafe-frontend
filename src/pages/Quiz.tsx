@@ -1,6 +1,7 @@
 import Card from "../components/Card";
 import Title from "../components/Title";
 import Button from "../components/Button";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { BookOpen, ChartColumn, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IQuiz } from "../interfaces/IQuiz";
@@ -17,6 +18,8 @@ function Quiz() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [deletingQuizId, setDeletingQuizId] = useState<number | null>(null);
+    const [quizToDelete, setQuizToDelete] = useState<QuizWithTitle | null>(null);
+    const [deleteError, setDeleteError] = useState("");
     const user = getTokenPayload();
     const isTeacher = user?.role === userRole.PROFESSOR;
     const isStudent = user?.role === userRole.ALUNO;
@@ -28,22 +31,19 @@ function Quiz() {
         }
 
         if (!isTeacher || quiz.teacherId !== user?.sub) {
-            setError("Você pode excluir apenas seus próprios quizzes.");
-            return;
-        }
-
-        if (!window.confirm(`Deseja excluir o quiz "${quiz.title}"? As questões, alternativas e tentativas dos alunos também serão excluídas.`)) {
+            setDeleteError("Você pode excluir apenas seus próprios quizzes.");
             return;
         }
 
         setError("");
+        setDeleteError("");
 
         try {
             setDeletingQuizId(quiz.id);
             const token = sessionStorage.getItem("token");
 
             if (!token) {
-                setError("Sua sessão terminou. Faça login novamente.");
+                setDeleteError("Sua sessão terminou. Faça login novamente.");
                 return;
             }
 
@@ -56,11 +56,12 @@ function Quiz() {
 
             if (response.ok) {
                 setQuizzes((currentQuizzes) => currentQuizzes.filter((item) => item.id !== quiz.id));
+                setQuizToDelete(null);
             } else {
-                setError("Não foi possível excluir o quiz. Tente novamente.");
+                setDeleteError("Não foi possível excluir o quiz. Tente novamente.");
             }
         } catch {
-            setError("Não foi possível excluir o quiz. Tente novamente.");
+            setDeleteError("Não foi possível excluir o quiz. Tente novamente.");
         } finally {
             setDeletingQuizId(null);
         }
@@ -170,7 +171,7 @@ function Quiz() {
                                         <Pencil size={16} />
                                         <span className="hidden @[22rem]:inline">Editar</span>
                                     </Button>
-                                    <Button className="shrink-0 px-1.5 gap-1!" title={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} aria-label={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} variant="secondary" onClick={() => handleDelete(quiz)} disabled={deletingQuizId !== null}>
+                                    <Button className="shrink-0 px-1.5 gap-1!" title={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} aria-label={deletingQuizId === quiz.id ? "Excluindo..." : "Excluir quiz"} variant="secondary" onClick={() => { setDeleteError(""); setQuizToDelete(quiz); }} disabled={deletingQuizId !== null}>
                                         <Trash size={16} />
                                         <span className="hidden @[22rem]:inline">{deletingQuizId === quiz.id ? "Excluindo..." : "Excluir"}</span>
                                     </Button>
@@ -180,6 +181,9 @@ function Quiz() {
                     </Card>
                 ))}
             </div>
+            <ConfirmDialog open={quizToDelete !== null} title="Excluir quiz" description={`Deseja excluir o quiz "${quizToDelete?.title ?? ""}"? As questões, alternativas e tentativas dos alunos também serão excluídas. Essa ação não pode ser desfeita.`}
+                confirmLabel="Excluir quiz" busy={deletingQuizId !== null} error={deleteError}
+                onCancel={() => setQuizToDelete(null)} onConfirm={async () => { if (quizToDelete) await handleDelete(quizToDelete); }} />
         </>
     );
 }

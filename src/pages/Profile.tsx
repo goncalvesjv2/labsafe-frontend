@@ -3,6 +3,7 @@ import { Trash, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Card from "../components/Card";
+import ConfirmDialog from "../components/ConfirmDialog";
 import Title from "../components/Title";
 import type { IUsers } from "../interfaces/IUsers";
 import { mapUserRole, userRole } from "../utils/user";
@@ -14,6 +15,7 @@ function Profile({ userId }: { userId?: number }) {
     const [error, setError] = useState("");
     const [deleteError, setDeleteError] = useState("");
     const [deleting, setDeleting] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const deleteInProgress = useRef(false);
     const navigate = useNavigate();
 
@@ -74,10 +76,6 @@ function Profile({ userId }: { userId?: number }) {
 
     async function handleDeleteAccount() {
         if (!canDeleteAccount || deleteInProgress.current) return;
-
-        if (!window.confirm("Deseja excluir permanentemente sua conta do LabSafe? Você perderá o acesso à plataforma. Essa ação não pode ser desfeita.")) {
-            return;
-        }
 
         deleteInProgress.current = true;
         setDeleting(true);
@@ -159,13 +157,16 @@ function Profile({ userId }: { userId?: number }) {
             </div>
             {canDeleteAccount && (
                 <div className="mt-4 flex flex-col items-end gap-2">
-                    {deleteError && <p role="alert" className="text-small text-red-600">{deleteError}</p>}
-                    <Button onClick={handleDeleteAccount} disabled={deleting} aria-busy={deleting} className="bg-red-700 hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700">
+                    <Button onClick={() => { setDeleteError(""); setShowDeleteConfirmation(true); }} disabled={deleting} aria-busy={deleting} className="bg-red-700 hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700">
                         <Trash size={16} aria-hidden="true" />
                         {deleting ? "Excluindo conta..." : "Excluir minha conta"}
                     </Button>
                 </div>
             )}
+            <ConfirmDialog open={showDeleteConfirmation && canDeleteAccount} title="Excluir minha conta"
+                description="Deseja excluir permanentemente sua conta do LabSafe? Você perderá o acesso à plataforma. Essa ação não pode ser desfeita."
+                confirmLabel="Excluir minha conta" busy={deleting} error={deleteError}
+                onCancel={() => setShowDeleteConfirmation(false)} onConfirm={handleDeleteAccount} />
         </>
     );
 }

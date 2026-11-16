@@ -9,8 +9,13 @@ export interface IAttempt {
 
 export interface IQuizResult {
     attempt: IAttempt;
-    totalQuestions: number;
-    correctCount: number;
+    totalQuestions: number | null;
+    correctCount: number | null;
+}
+
+export interface IStudentQuizResult {
+    canAnswer: boolean;
+    result: IQuizResult | null;
 }
 
 export interface IAttemptWithStudent extends IAttempt {

@@ -5,7 +5,7 @@ import Button from "../components/Button";
 import Card from "../components/Card";
 import Title from "../components/Title";
 import type { IContent } from "../interfaces/IContent";
-import type { IQuizResult } from "../interfaces/IAttempt";
+import type { IQuizResult, IStudentQuizResult } from "../interfaces/IAttempt";
 import type { IQuestion, IQuiz } from "../interfaces/IQuiz";
 import { getTokenPayload } from "../utils/token";
 import { userRole } from "../utils/user";
@@ -65,16 +65,42 @@ function QuizPage({ id }: { id: number }) {
                 }
 
                 const quizData: IQuiz = await quizResponse.json();
-                const [contentResponse, questionsResponse] = await Promise.all([
+                const [contentResponse, resultResponse] = await Promise.all([
                     fetch(`${import.meta.env.VITE_API_URL}/api/contents/${quizData.contentId}`, { headers }),
-                    fetch(`${import.meta.env.VITE_API_URL}/api/quizzes/${id}/questions`, { headers }),
+                    isStudent ? fetch(`${import.meta.env.VITE_API_URL}/api/quizzes/${id}/result`, { headers }) : null,
                 ]);
 
-                if (!contentResponse.ok || !questionsResponse.ok) {
+                if (!contentResponse.ok) {
                     throw new Error("Não foi possível carregar os dados do quiz.");
                 }
 
                 const content: IContent = await contentResponse.json();
+                setTitle(content.title);
+
+                if (resultResponse) {
+                    if (!resultResponse.ok) {
+                        throw new Error("Não foi possível consultar seu resultado. Tente novamente.");
+                    }
+
+                    const studentResult: IStudentQuizResult = await resultResponse.json();
+
+                    if (!studentResult.canAnswer) {
+                        if (!studentResult.result) {
+                            throw new Error("Não foi possível carregar seu resultado. Tente novamente.");
+                        }
+
+                        setResult(studentResult.result);
+                        setQuiz(quizData);
+                        return;
+                    }
+                }
+
+                const questionsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/quizzes/${id}/questions`, { headers });
+
+                if (!questionsResponse.ok) {
+                    throw new Error("Não foi possível carregar as questões do quiz.");
+                }
+
                 const questionsData: IQuestion[] = await questionsResponse.json();
                 const loadedQuestions: QuizQuestion[] = [];
 
@@ -89,7 +115,6 @@ function QuizPage({ id }: { id: number }) {
                 }
 
                 reset({ answers: loadedQuestions.map(() => ({ alternativeId: "" })) });
-                setTitle(content.title);
                 setQuestions(loadedQuestions);
                 setQuiz(quizData);
             } catch (error) {
@@ -100,7 +125,7 @@ function QuizPage({ id }: { id: number }) {
         }
 
         fetchQuiz();
-    }, [id, reset]);
+    }, [id, isStudent, reset]);
 
     async function submitAnswers(data: AnswersFormData) {
         if (!isStudent || !quiz || !canAnswer || result) return;
@@ -150,8 +175,11 @@ function QuizPage({ id }: { id: number }) {
                         {result ? (
                             <div role="status" className="flex flex-col gap-3 rounded-md border border-border p-4">
                                 <h2 className="text-normal font-bold">Seu resultado</h2>
-                                <p className="text-normal">Acertos: {result.correctCount} de {result.totalQuestions}</p>
-                                <p className="text-normal">Nota: {result.attempt.score.toLocaleString("pt-BR")}%</p>
+                                <p className="text-normal">
+                                    Nota: {result.correctCount !== null && result.totalQuestions !== null
+                                        ? `${result.correctCount}/${result.totalQuestions}`
+                                        : `${result.attempt.score.toLocaleString("pt-BR")}%`}
+                                </p>
                                 <p className={`text-normal font-bold ${result.attempt.approved ? "text-green-700" : "text-red-500"}`}>
                                     {result.attempt.approved ? "Aprovado" : "Não aprovado"}
                                 </p>
@@ -196,7 +224,7 @@ function QuizPage({ id }: { id: number }) {
                         )}
                     </>
                 )}
-                <div className="flex justify-end mt-auto pt-4">
+                <div className={`flex justify-end pt-4 ${result ? "" : "mt-auto"}`}>
                     <Button variant="secondary" disabled={isSubmitting} onClick={() => navigate("/quiz")}>Voltar</Button>
                 </div>
             </Card>

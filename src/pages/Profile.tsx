@@ -5,21 +5,27 @@ import Title from "../components/Title";
 import type { IUsers } from "../interfaces/IUsers";
 import { mapUserRole } from "../utils/user";
 
-function Profile() {
+function Profile({ userId }: { userId?: number }) {
     const [profile, setProfile] = useState<IUsers | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
+        let active = true;
         async function fetchProfile() {
             try {
+                if (userId !== undefined && (!Number.isSafeInteger(userId) || userId <= 0)) {
+                    throw new Error("ID do usuário inválido.");
+                }
+
                 const token = sessionStorage.getItem("token");
 
                 if (!token) {
                     throw new Error("Sua sessão terminou. Faça login novamente.");
                 }
 
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+                const endpoint = userId === undefined ? "/auth/me" : `/api/users/${userId}`;
+                const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -27,27 +33,36 @@ function Profile() {
                     throw new Error("Sua sessão terminou. Faça login novamente.");
                 }
 
+                if (response.status === 403) {
+                    throw new Error("Você não tem permissão para consultar este perfil.");
+                }
+
+                if (response.status === 404) {
+                    throw new Error("Usuário não encontrado.");
+                }
+
                 if (!response.ok) {
-                    throw new Error("Não foi possível carregar seu perfil. Tente novamente.");
+                    throw new Error("Não foi possível carregar o perfil. Tente novamente.");
                 }
 
                 const data: IUsers = await response.json();
-                setProfile(data);
+                if (active) setProfile(data);
             } catch (error) {
-                setError(error instanceof Error ? error.message : "Não foi possível carregar seu perfil.");
+                if (active) setError(error instanceof Error ? error.message : "Não foi possível carregar o perfil.");
             } finally {
-                setLoading(false);
+                if (active) setLoading(false);
             }
         }
 
         fetchProfile();
-    }, []);
+        return () => { active = false; };
+    }, [userId]);
 
     const role = profile ? mapUserRole(profile.role) ?? profile.role : "";
 
     return (
         <>
-            <Title>Meu perfil</Title>
+            <Title>{userId === undefined ? "Meu perfil" : "Perfil do usuário"}</Title>
             <div className="flex justify-center mt-8">
                 <Card className="w-full max-w-xl min-w-0" role="region" aria-label="Informações do usuário">
                     {loading && <p role="status" className="text-small">Carregando perfil...</p>}

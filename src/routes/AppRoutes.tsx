@@ -27,6 +27,7 @@ import EditQuiz from "../pages/EditQuiz";
 import ViewQuiz from "../pages/ViewQuiz";
 import QuizPerformance from "../pages/QuizPerformance";
 import Profile from "../pages/Profile";
+import UserProfile from "../pages/UserProfile";
 
 function AppRoutes() {
     return (
@@ -47,6 +48,7 @@ function AppRoutes() {
                         <Route path="/dashboard" element={<Dashboard />} />
                     </Route>
                     <Route element={<AdminRoutes />}>
+                        <Route path="/profile/:id" element={<UserProfile />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />
                         <Route path="/users/edit/:id" element={<EditUser />} />

@@ -6,9 +6,11 @@ export const forgotPasswordSchema = z.object({
 
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
+const passwordSchema = z.string().trim().min(8, "A senha deve ter no mínimo 8 caracteres.").refine((password) => new TextEncoder().encode(password).length <= 72, "A senha deve ter no máximo 72 bytes.");
+
 export const resetPasswordSchema = z.object({
-    password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres."),
-    confirmPassword: z.string().min(1, "Confirme a nova senha."),
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
 }).refine((data) => data.password === data.confirmPassword, {
     error: "As senhas devem ser iguais.",
     path: ["confirmPassword"],

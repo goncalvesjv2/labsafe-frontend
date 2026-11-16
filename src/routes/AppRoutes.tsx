@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
@@ -28,6 +29,8 @@ import ViewQuiz from "../pages/ViewQuiz";
 import QuizPerformance from "../pages/QuizPerformance";
 import Profile from "../pages/Profile";
 import UserProfile from "../pages/UserProfile";
+
+const NotFound = lazy(() => import("../pages/NotFound"));
 
 function AppRoutes() {
     return (
@@ -68,6 +71,15 @@ function AppRoutes() {
                     </Route>
                 </Route>
             </Route>
+            <Route path="*" element={
+                <Suspense fallback={
+                    <main className="min-h-dvh flex items-center justify-center p-4 text-center">
+                        <p role="status" className="text-small">Carregando página...</p>
+                    </main>
+                }>
+                    <NotFound />
+                </Suspense>
+            } />
         </Routes>
     )
 }

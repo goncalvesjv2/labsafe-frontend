@@ -109,9 +109,9 @@ function Content() {
             )}
             <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-3">
                 {contents.map((content) => (
-                    <Card key={content.id} className="min-w-0">
+                    <Card key={content.id} className="flex min-w-0 flex-col gap-4">
                         <p className="text-normal font-bold break-words">{content.title}</p>
-                        <div className="flex flex-wrap gap-2 mt-4">
+                        <div className="mt-auto flex flex-wrap gap-2">
                             <Button onClick={() => handleAccess(content.id)} disabled={deleteContent === content.id}>Acessar</Button>
                             {user?.role === userRole.PROFESSOR && content.teacherId === user.sub && (
                                 <>

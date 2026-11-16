@@ -116,11 +116,11 @@ function Quiz() {
             {!loading && !error && quizzes.length === 0 && (
                 <p className="mt-4 text-small">Nenhum quiz cadastrado.</p>
             )}
-            <div className={`gap-4 mt-4 ${isTeacher ? "flex flex-wrap items-start" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"}`}>
+            <div className={`gap-4 mt-4 ${isTeacher ? "flex flex-wrap items-stretch" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"}`}>
                 {quizzes.map((quiz) => (
-                    <Card key={quiz.id} className={`@container min-w-0 ${isTeacher ? "w-full max-w-sm" : ""}`}>
+                    <Card key={quiz.id} className={`@container flex min-w-0 flex-col gap-4 ${isTeacher ? "w-full max-w-sm" : ""}`}>
                         <p className="text-normal font-bold break-words">{quiz.title}</p>
-                        <div className="flex flex-nowrap gap-1 mt-4 whitespace-nowrap">
+                        <div className="mt-auto flex flex-nowrap gap-1 whitespace-nowrap">
                             <Button className="shrink-0 px-1.5" title="Acessar quiz" aria-label="Acessar quiz" onClick={() => navigate(`/quiz/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
                                 <BookOpen size={16} className="@3xs:hidden" />
                                 <span className="hidden @3xs:inline">Acessar</span>

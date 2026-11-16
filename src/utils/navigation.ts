@@ -23,7 +23,7 @@ export const menusByRole = {
         { text: "Conteúdo", path: "/contents", icon: SquareText },
         { text: "Quiz", path: "/quiz", icon: ClipboardList },
         { text: "Perfil", path: "/profile", icon: User },
-        { text: "Reagentes", path: "/reagents", icon: FlaskConical },
+        { text: "Compostos", path: "/reagents", icon: FlaskConical },
     ],
 } satisfies Record<UserRole, [MenuItem, ...MenuItem[]]>;
 

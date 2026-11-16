@@ -29,7 +29,7 @@ function Reagent() {
             const token = sessionStorage.getItem("token");
 
             if (!token) {
-                setError("Faça login novamente para consultar reagentes.");
+                setError("Faça login novamente para consultar compostos.");
                 return;
             }
 
@@ -42,10 +42,10 @@ function Reagent() {
             if (!response.ok) {
                 const messages: Record<number, string> = {
                     401: "Sessão expirada ou inválida. Faça login novamente.",
-                    403: "Você não tem permissão para consultar reagentes.",
+                    403: "Você não tem permissão para consultar compostos.",
                     404: "Composto não encontrado."
                 };
-                setError(messages[response.status] ?? "Não foi possível consultar o reagente. Tente novamente.");
+                setError(messages[response.status] ?? "Não foi possível consultar o composto. Tente novamente.");
                 return;
             }
 
@@ -53,7 +53,7 @@ function Reagent() {
             setCompound(compoundData);
             reset();
         } catch {
-            setError("Não foi possível consultar o reagente. Tente novamente.");
+            setError("Não foi possível consultar o composto. Tente novamente.");
         }
     }
 
@@ -64,15 +64,18 @@ function Reagent() {
 
     return (
         <>
-            <Title>Consultar Reagentes</Title>
-            <form onSubmit={handleSubmit(searchReagent, handleInvalidSubmit)} noValidate className="mt-4 flex justify-between">
-                <Input placeholder="Consultar reagente" disabled={isSubmitting} {...register("reagent", {
-                    onChange: () => {
-                        clearErrors("reagent");
-                        setError("");
-                    },
-                })} />
-                <Button type="submit" disabled={isSubmitting}>Consultar</Button>
+            <Title>Consultar Compostos</Title>
+            <form onSubmit={handleSubmit(searchReagent, handleInvalidSubmit)} noValidate className="mt-4 flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                    <Input className="w-full min-w-0" placeholder="Consultar composto" aria-label="Nome do composto" aria-describedby="compound-search-hint" disabled={isSubmitting} {...register("reagent", {
+                        onChange: () => {
+                            clearErrors("reagent");
+                            setError("");
+                        },
+                    })} />
+                    <p id="compound-search-hint" className="mt-2 text-small">Observação: digite o nome do composto em inglês.</p>
+                </div>
+                <Button type="submit" className="shrink-0" disabled={isSubmitting}>Consultar</Button>
             </form>
             {errors.reagent && <p role="alert" className="mt-4 text-red-500">{errors.reagent.message}</p>}
             {isSubmitting && <p className="mt-4">Consultando...</p>}

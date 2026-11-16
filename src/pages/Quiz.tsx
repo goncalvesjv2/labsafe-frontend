@@ -5,11 +5,12 @@ import { BookOpen, ChartColumn, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IQuiz } from "../interfaces/IQuiz";
 import type { IContent } from "../interfaces/IContent";
+import type { IQuizResult, IStudentQuizResult } from "../interfaces/IAttempt";
 import { getTokenPayload } from "../utils/token";
 import { userRole } from "../utils/user";
 import { useNavigate } from "react-router-dom";
 
-type QuizWithTitle = IQuiz & { title: string };
+type QuizWithTitle = IQuiz & { title: string; result: IQuizResult | null; resultError?: boolean };
 
 function Quiz() {
     const [quizzes, setQuizzes] = useState<QuizWithTitle[]>([]);
@@ -18,6 +19,7 @@ function Quiz() {
     const [deletingQuizId, setDeletingQuizId] = useState<number | null>(null);
     const user = getTokenPayload();
     const isTeacher = user?.role === userRole.PROFESSOR;
+    const isStudent = user?.role === userRole.ALUNO;
     const navigate = useNavigate();
 
     async function handleDelete(quiz: QuizWithTitle) {
@@ -85,11 +87,31 @@ function Quiz() {
                     contentsResponse.json(),
                 ]);
 
-                setQuizzes(quizzesData.map((quiz) => ({
-                    ...quiz,
-                    title: contentsData.find((content) => content.id === quiz.contentId)?.title
-                        ?? `Quiz do conteúdo #${quiz.contentId}`,
-                })));
+                const quizzesWithResults = await Promise.all(quizzesData.map(async (quiz): Promise<QuizWithTitle> => {
+                    const quizWithTitle: QuizWithTitle = {
+                        ...quiz,
+                        title: contentsData.find((content) => content.id === quiz.contentId)?.title
+                            ?? `Quiz do conteúdo #${quiz.contentId}`,
+                        result: null,
+                    };
+
+                    if (!isStudent) return quizWithTitle;
+
+                    try {
+                        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/quizzes/${quiz.id}/result`, options);
+
+                        if (!response.ok) {
+                            throw new Error("Não foi possível carregar a nota.");
+                        }
+
+                        const data: IStudentQuizResult = await response.json();
+                        return { ...quizWithTitle, result: data.result };
+                    } catch {
+                        return { ...quizWithTitle, resultError: true };
+                    }
+                }));
+
+                setQuizzes(quizzesWithResults);
             } catch {
                 setError("Não foi possível carregar os quizzes");
             } finally {
@@ -98,7 +120,7 @@ function Quiz() {
         }
 
         fetchQuizzes();
-    }, []);
+    }, [isStudent]);
 
     return (
         <>
@@ -120,6 +142,19 @@ function Quiz() {
                 {quizzes.map((quiz) => (
                     <Card key={quiz.id} className={`@container flex min-w-0 flex-col gap-4 ${isTeacher ? "w-full max-w-sm" : ""}`}>
                         <p className="text-normal font-bold break-words">{quiz.title}</p>
+                        {isStudent && quiz.result?.attempt.approved && (
+                            <div className="flex flex-col gap-1">
+                                <p className="text-small font-bold text-green-700">Aprovado</p>
+                                <p className="text-normal">
+                                    Nota: {quiz.result.correctCount !== null && quiz.result.totalQuestions !== null
+                                        ? `${quiz.result.correctCount}/${quiz.result.totalQuestions}`
+                                        : `${quiz.result.attempt.score.toLocaleString("pt-BR")}%`}
+                                </p>
+                            </div>
+                        )}
+                        {isStudent && quiz.resultError && (
+                            <p role="status" className="text-small text-border">Não foi possível carregar a nota.</p>
+                        )}
                         <div className="mt-auto flex flex-nowrap gap-1 whitespace-nowrap">
                             <Button className="shrink-0 px-1.5" title="Acessar quiz" aria-label="Acessar quiz" onClick={() => navigate(`/quiz/${quiz.id}`)} disabled={deletingQuizId === quiz.id}>
                                 <BookOpen size={16} className="@3xs:hidden" />

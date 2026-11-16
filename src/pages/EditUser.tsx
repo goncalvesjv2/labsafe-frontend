@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/Button";
@@ -11,6 +11,7 @@ import Title from "../components/Title";
 import { updateUserSchema, type UpdateUserFormData } from "../schemas/userSchema";
 import type { IUsers } from "../interfaces/IUsers";
 import { mapUserRole } from "../utils/user";
+import { getTokenPayload } from "../utils/token";
 
 function EditUserForm({ id }: { id: number }) {
     const { register, control, handleSubmit, reset, clearErrors, formState: { errors, isSubmitting, isDirty } } = useForm<UpdateUserFormData>({
@@ -229,6 +230,11 @@ function EditUserForm({ id }: { id: number }) {
 
 function EditUser() {
     const { id } = useParams();
+    const loggedUser = getTokenPayload();
+
+    if (!loggedUser) return <Navigate to="/" replace />;
+    if (Number(id) === loggedUser.sub) return <Navigate to="/users" replace />;
+
     return <EditUserForm key={id} id={Number(id)} />;
 }
 

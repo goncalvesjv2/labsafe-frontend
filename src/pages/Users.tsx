@@ -121,6 +121,7 @@ function Users() {
     }
 
     function handleEdit(id: number) {
+        if (loggedUserId === null || id === loggedUserId) return;
         navigate(`/users/edit/${id}`);
     }
 
@@ -167,7 +168,8 @@ function Users() {
                     )}
                     {filteredUsers.map((user) => {
                         const isUpdating = updatingIds.includes(user.id);
-                        const cannotDeactivate = user.id === loggedUserId && user.ativo;
+                        const isCurrentUser = user.id === loggedUserId;
+                        const cannotDeactivate = isCurrentUser && user.ativo;
 
                         return (
                             <tr key={user.id}>
@@ -177,7 +179,7 @@ function Users() {
                                 <td className="p-2 text-center align-middle"><Status ativo={user.ativo} /></td>
                                 <td className="p-2 align-middle">
                                     <div className="flex items-center justify-center gap-2">
-                                        <Button onClick={() => handleEdit(user.id)} variant="secondary" disabled={isUpdating} className="min-w-16 whitespace-nowrap">Editar</Button>
+                                        <Button onClick={() => handleEdit(user.id)} variant="secondary" disabled={isUpdating || isCurrentUser || loggedUserId === null} title={isCurrentUser ? "Você não pode editar sua própria conta" : undefined} className="min-w-16 whitespace-nowrap">Editar</Button>
                                         <Button onClick={() => handleChangeStatus(user)} variant="secondary" disabled={isUpdating || cannotDeactivate || loggedUserId === null} aria-busy={isUpdating} title={cannotDeactivate ? "Você não pode desativar sua própria conta" : undefined} className="min-w-28 whitespace-nowrap">
                                             {isUpdating
                                                 ? (user.ativo ? "Desativando..." : "Reativando...")

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,11 +31,13 @@ function EditUserForm({ id }: { id: number }) {
     const [loading, setLoading] = useState(true);
     const [resending, setResending] = useState(false);
     const [userActive, setUserActive] = useState(false);
+    const [hasPassword, setHasPassword] = useState<boolean | null>(null);
     const [savedEmail, setSavedEmail] = useState<string | null>(null);
+    const resendInProgress = useRef(false);
     const email = useWatch({ control, name: "email" });
     const emailChanged = savedEmail !== null && email.trim().toLowerCase() !== savedEmail.trim().toLowerCase();
     const disabled = loading || isSubmitting || resending || savedEmail === null;
-    const canResend = !disabled && !isDirty && userActive;
+    const canResend = !disabled && !isDirty && userActive && hasPassword === false;
 
     function clearFeedback() {
         setMessage("");
@@ -68,6 +70,7 @@ function EditUserForm({ id }: { id: number }) {
                 reset({ name: data.name, email: data.email, role });
                 setSavedEmail(data.email);
                 setUserActive(data.ativo);
+                setHasPassword(typeof data.hasPassword === "boolean" ? data.hasPassword : null);
             } catch (error) {
                 if (active) setError(error instanceof Error ? error.message : "Não foi possível carregar o usuário.");
             } finally {
@@ -116,9 +119,11 @@ function EditUserForm({ id }: { id: number }) {
             });
             setSavedEmail(updatedEmail);
             if (typeof data?.ativo === "boolean") setUserActive(data.ativo);
+            const updatedHasPassword = typeof data?.hasPassword === "boolean" ? data.hasPassword : null;
+            setHasPassword(updatedHasPassword);
             setMessage("Usuário atualizado com sucesso.");
-            if (changedEmail) {
-                setWarning("E-mail alterado. Se o usuário ainda não criou a senha, será necessário reenviar o convite para o novo endereço.");
+            if (changedEmail && updatedHasPassword === false) {
+                setWarning("E-mail alterado. Reenvie o convite para o novo endereço após verificar se a conta está ativa.");
             }
         } catch (error) {
             setError(error instanceof Error ? error.message : "Ocorreu um erro ao atualizar usuário");
@@ -126,13 +131,38 @@ function EditUserForm({ id }: { id: number }) {
     }
 
     async function handleResendInvitation() {
-        if (!canResend) return;
+        if (!canResend || resendInProgress.current) return;
+        resendInProgress.current = true;
         clearFeedback();
         setResending(true);
 
         try {
             const token = sessionStorage.getItem("token");
             if (!token) throw new Error("Sua sessão terminou. Faça login novamente.");
+
+            const userResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!userResponse.ok) throw new Error("Não foi possível verificar se o usuário pode receber um novo convite. Tente novamente.");
+
+            const currentUser: IUsers = await userResponse.json();
+            setUserActive(currentUser.ativo);
+            setHasPassword(typeof currentUser.hasPassword === "boolean" ? currentUser.hasPassword : null);
+
+            if (currentUser.hasPassword === true) {
+                setWarning("Este usuário já definiu a senha. Para recuperar o acesso, ele pode utilizar a opção Esqueci minha senha.");
+                return;
+            }
+            if (!currentUser.ativo) {
+                setWarning("A conta está desativada. Reative-a antes de reenviar o convite.");
+                return;
+            }
+            if (currentUser.hasPassword !== false) {
+                throw new Error("Não foi possível verificar se a senha já foi definida. Recarregue a página e tente novamente.");
+            }
+            if (currentUser.email.trim().toLowerCase() !== savedEmail?.trim().toLowerCase()) {
+                throw new Error("O e-mail deste usuário foi alterado. Recarregue a página antes de reenviar o convite.");
+            }
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}/invitations/resend`, {
                 method: "POST",
@@ -155,6 +185,7 @@ function EditUserForm({ id }: { id: number }) {
                 ? error.message
                 : "Não foi possível conectar ao servidor. Tente novamente.");
         } finally {
+            resendInProgress.current = false;
             setResending(false);
         }
     }
@@ -192,7 +223,7 @@ function EditUserForm({ id }: { id: number }) {
                                 },
                             })} />
                             {errors.email && <p role="alert" className="text-red-500 text-small">{errors.email.message}</p>}
-                            {emailChanged && <p role="status" className="text-small text-amber-700">O e-mail foi alterado. Salve as alterações antes de reenviar o convite.</p>}
+                            {emailChanged && hasPassword === false && <p role="status" className="text-small text-amber-700">O e-mail foi alterado. Salve as alterações antes de reenviar o convite.</p>}
                         </FormField>
                         <FormField label="Cargo:" htmlFor="edit-role">
                             <Select id="edit-role" disabled={disabled} {...register("role", {
@@ -208,15 +239,27 @@ function EditUserForm({ id }: { id: number }) {
                             </Select>
                             {errors.role && <p role="alert" className="text-red-500 text-small">{errors.role.message}</p>}
                         </FormField>
-                        {isDirty && !emailChanged && <p role="status" className="text-small text-amber-700">Salve as alterações antes de reenviar o convite.</p>}
-                        <p className="text-small text-border">Convites podem ser reenviados apenas para contas ativas que ainda não definiram a senha.</p>
+                        {isDirty && !emailChanged && hasPassword === false && <p role="status" className="text-small text-amber-700">Salve as alterações antes de reenviar o convite.</p>}
+                        {!loading && savedEmail !== null && (
+                            <p role="status" className="text-small text-border">
+                                {hasPassword === true
+                                    ? "Este usuário já definiu a senha. Para recuperar o acesso, ele pode utilizar a opção Esqueci minha senha."
+                                    : hasPassword === false
+                                        ? userActive
+                                            ? "Este usuário ainda não definiu a senha. O novo convite será válido por 5 minutos."
+                                            : "A conta está desativada. Reative-a antes de reenviar o convite."
+                                        : "Não foi possível verificar se a senha já foi definida. Recarregue a página para verificar a disponibilidade do convite."}
+                            </p>
+                        )}
                         <div className="grid grid-cols-2 gap-3">
-                            <Button type="submit" disabled={disabled} className="w-full">
+                            <Button type="submit" disabled={disabled} className={`w-full ${hasPassword === false ? "" : "col-span-2"}`}>
                                 {isSubmitting ? "Salvando..." : "Salvar alterações"}
                             </Button>
-                            <Button onClick={handleResendInvitation} variant="secondary" disabled={!canResend} className="w-full">
-                                {resending ? "Reenviando..." : "Reenviar convite"}
-                            </Button>
+                            {hasPassword === false && (
+                                <Button onClick={handleResendInvitation} variant="secondary" disabled={!canResend} aria-busy={resending} className="w-full">
+                                    {resending ? "Reenviando..." : "Reenviar convite"}
+                                </Button>
+                            )}
                             <Button onClick={handleCancel} variant="secondary" disabled={isSubmitting || resending} className="col-span-2 w-full">
                                 Cancelar
                             </Button>

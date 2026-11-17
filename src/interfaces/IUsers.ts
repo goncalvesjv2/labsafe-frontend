@@ -4,4 +4,5 @@ export interface IUsers {
     email: string;
     role: string;
     ativo: boolean;
+    hasPassword?: boolean;
 }

@@ -4,6 +4,7 @@ import { Award, ChartColumn, ClipboardList, GraduationCap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, Tooltip, XAxis, YAxis } from "recharts";
 import Button from "../components/Button";
 import Card from "../components/Card";
+import Select from "../components/Select";
 import Title from "../components/Title";
 import type { IAttempt } from "../interfaces/IAttempt";
 import type { IContent } from "../interfaces/IContent";
@@ -45,6 +46,7 @@ function formatPercentage(value: number) {
 
 function TeacherDashboard() {
     const [quizzes, setQuizzes] = useState<QuizWithResults[]>([]);
+    const [selectedQuizId, setSelectedQuizId] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -103,7 +105,8 @@ function TeacherDashboard() {
         fetchDashboard();
     }, []);
 
-    const latestAttempts = quizzes.flatMap((quiz) => quiz.attempts);
+    const selectedQuiz = quizzes.find((quiz) => String(quiz.id) === selectedQuizId);
+    const latestAttempts = selectedQuiz ? selectedQuiz.attempts : quizzes.flatMap((quiz) => quiz.attempts);
     const totalStudents = new Set(latestAttempts.map((attempt) => attempt.studentId)).size;
     const averageScore = getAverageScore(latestAttempts);
     const approvedCount = latestAttempts.filter((attempt) => attempt.approved).length;
@@ -122,6 +125,15 @@ function TeacherDashboard() {
             {error && <p role="alert" className="mt-4 text-small text-red-500">{error}</p>}
             {!loading && !error && (
                 <>
+                    <div className="mt-4 flex flex-col gap-2 sm:max-w-sm">
+                        <label htmlFor="dashboard-quiz" className="text-normal font-bold">Filtrar por quiz</label>
+                        <Select id="dashboard-quiz" value={selectedQuizId} onChange={(event) => setSelectedQuizId(event.target.value)} disabled={quizzes.length === 0}>
+                            <option value="">Selecione</option>
+                            {quizzes.map((quiz) => (
+                                <option key={quiz.id} value={quiz.id}>{quiz.title}</option>
+                            ))}
+                        </Select>
+                    </div>
                     <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-4">
                         <Card className="min-w-0">
                             <div className="flex items-center justify-between gap-2">
@@ -152,6 +164,9 @@ function TeacherDashboard() {
                             <p className="mt-3 text-3xl font-bold text-primary">{latestAttempts.length > 0 ? formatPercentage(approvalRate) : "—"}</p>
                         </Card>
                     </div>
+                    {selectedQuiz && latestAttempts.length === 0 && (
+                        <p role="status" className="mt-3 text-small">Nenhum aluno respondeu a este quiz ainda.</p>
+                    )}
                     <p className="mt-3 text-small text-border">A média e a aprovação consideram apenas a última tentativa de cada aluno em cada quiz.</p>
                     <Card className="min-w-0 mt-4">
                         <h2 className="text-normal font-bold">Média das notas por quiz</h2>

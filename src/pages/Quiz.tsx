@@ -1,7 +1,7 @@
 import Card from "../components/Card";
 import Title from "../components/Title";
 import Button from "../components/Button";
-import ConfirmDialog from "../components/ConfirmDialog";
+import Modal from "../components/Modal";
 import { BookOpen, ChartColumn, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IQuiz } from "../interfaces/IQuiz";
@@ -181,9 +181,7 @@ function Quiz() {
                     </Card>
                 ))}
             </div>
-            <ConfirmDialog open={quizToDelete !== null} title="Excluir quiz" description={`Deseja excluir o quiz "${quizToDelete?.title ?? ""}"? As questões, alternativas e tentativas dos alunos também serão excluídas. Essa ação não pode ser desfeita.`}
-                confirmLabel="Excluir quiz" busy={deletingQuizId !== null} error={deleteError}
-                onCancel={() => setQuizToDelete(null)} onConfirm={async () => { if (quizToDelete) await handleDelete(quizToDelete); }} />
+            <Modal open={quizToDelete !== null} description={`Deseja excluir o quiz "${quizToDelete?.title ?? ""}"? As questões, alternativas e tentativas dos alunos também serão excluídas. Essa ação não pode ser desfeita.`} busy={deletingQuizId !== null} error={deleteError} onCancel={() => setQuizToDelete(null)} onConfirm={async () => { if (quizToDelete) await handleDelete(quizToDelete); }} />
         </>
     );
 }

@@ -3,7 +3,7 @@ import { Trash, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Card from "../components/Card";
-import ConfirmDialog from "../components/ConfirmDialog";
+import Modal from "../components/Modal";
 import Title from "../components/Title";
 import type { IUsers } from "../interfaces/IUsers";
 import { mapUserRole, userRole } from "../utils/user";
@@ -163,10 +163,7 @@ function Profile({ userId }: { userId?: number }) {
                     </Button>
                 </div>
             )}
-            <ConfirmDialog open={showDeleteConfirmation && canDeleteAccount} title="Excluir minha conta"
-                description="Deseja excluir permanentemente sua conta do LabSafe? Você perderá o acesso à plataforma. Essa ação não pode ser desfeita."
-                confirmLabel="Excluir minha conta" busy={deleting} error={deleteError}
-                onCancel={() => setShowDeleteConfirmation(false)} onConfirm={handleDeleteAccount} />
+            <Modal open={showDeleteConfirmation && canDeleteAccount} description="Deseja excluir permanentemente sua conta do LabSafe? Você perderá o acesso à plataforma. Essa ação não pode ser desfeita." busy={deleting} error={deleteError} onCancel={() => setShowDeleteConfirmation(false)} onConfirm={handleDeleteAccount} />
         </>
     );
 }

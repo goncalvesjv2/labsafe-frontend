@@ -1,7 +1,7 @@
 import Card from "../components/Card";
 import Title from "../components/Title";
 import Button from "../components/Button";
-import ConfirmDialog from "../components/ConfirmDialog";
+import Modal from "../components/Modal";
 import { Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { IContent } from "../interfaces/IContent";
@@ -134,9 +134,7 @@ function Content() {
                     </Card>
                 ))}
             </div>
-            <ConfirmDialog open={contentToDelete !== null} title="Excluir conteúdo" description={`Deseja excluir o conteúdo "${contentToDelete?.title ?? ""}"? Essa ação não pode ser desfeita.`}
-                confirmLabel="Excluir conteúdo" busy={deleteContent !== null} error={deleteError}
-                onCancel={() => setContentToDelete(null)} onConfirm={async () => { if (contentToDelete) await handleDelete(contentToDelete); }} />
+            <Modal open={contentToDelete !== null} description={`Deseja excluir o conteúdo "${contentToDelete?.title ?? ""}"? Essa ação não pode ser desfeita.`} busy={deleteContent !== null} error={deleteError} onCancel={() => setContentToDelete(null)} onConfirm={async () => { if (contentToDelete) await handleDelete(contentToDelete); }} />
         </>
     )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Award, ChartColumn, ClipboardList, GraduationCap } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, LabelList, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, Legend, Tooltip, XAxis, YAxis } from "recharts";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Select from "../components/Select";
@@ -110,16 +110,21 @@ function TeacherDashboard() {
     }, []);
 
     const selectedQuiz = quizzes.find((quiz) => String(quiz.id) === selectedQuizId);
-    const latestAttempts = selectedQuiz ? selectedQuiz.attempts : quizzes.flatMap((quiz) => quiz.attempts);
+    const filteredQuizzes = selectedQuiz ? [selectedQuiz] : quizzes;
+    const latestAttempts = filteredQuizzes.flatMap((quiz) => quiz.attempts);
     const totalStudents = new Set(latestAttempts.map((attempt) => attempt.studentId)).size;
     const averageScore = getAverageScore(latestAttempts);
     const approvedCount = latestAttempts.filter((attempt) => attempt.approved).length;
     const approvalRate = latestAttempts.length > 0 ? (approvedCount / latestAttempts.length) * 100 : 0;
-    const chartData = quizzes.filter((quiz) => quiz.attempts.length > 0).map((quiz) => ({
+    const chartData = filteredQuizzes.filter((quiz) => quiz.attempts.length > 0).map((quiz) => ({
         quizId: quiz.id,
         title: quiz.title,
-        average: Number(getAverageScore(quiz.attempts).toFixed(1)),
+        approved: quiz.attempts.filter((attempt) => attempt.approved).length,
+        notApproved: quiz.attempts.filter((attempt) => !attempt.approved).length,
     }));
+    const emptyChartMessage = quizzes.length === 0
+        ? "Você ainda não criou quizzes."
+        : selectedQuiz ? "Nenhum aluno respondeu a este quiz ainda." : "Nenhum aluno respondeu aos seus quizzes ainda.";
 
     return (
         <>
@@ -132,7 +137,7 @@ function TeacherDashboard() {
                     <div className="mt-4 flex flex-col gap-2 sm:max-w-sm">
                         <label htmlFor="dashboard-quiz" className="text-normal font-bold">Filtrar por quiz</label>
                         <Select id="dashboard-quiz" value={selectedQuizId} onChange={(event) => setSelectedQuizId(event.target.value)} disabled={quizzes.length === 0}>
-                            <option value="">Selecione</option>
+                            <option value="">Todos os quizzes</option>
                             {quizzes.map((quiz) => (
                                 <option key={quiz.id} value={quiz.id}>{quiz.title}</option>
                             ))}
@@ -168,29 +173,28 @@ function TeacherDashboard() {
                             <p className="mt-3 text-3xl font-bold text-primary">{latestAttempts.length > 0 ? formatPercentage(approvalRate) : "—"}</p>
                         </Card>
                     </div>
-                    {selectedQuiz && latestAttempts.length === 0 && (
-                        <p role="status" className="mt-3 text-small">Nenhum aluno respondeu a este quiz ainda.</p>
-                    )}
-                    <p className="mt-3 text-small text-border">A média e a aprovação consideram apenas a última tentativa de cada aluno em cada quiz.</p>
                     <Card className="min-w-0 mt-4">
-                        <h2 className="text-normal font-bold">Média das notas por quiz</h2>
+                        <h2 className="text-normal font-bold">Aprovados e não aprovados por quiz</h2>
                         {chartData.length === 0 ? (
-                            <p role="status" className="mt-4 text-small">
-                                {quizzes.length === 0 ? "Você ainda não criou quizzes." : "Nenhum aluno respondeu aos seus quizzes ainda."}
-                            </p>
+                            <p role="status" className="mt-4 text-small">{emptyChartMessage}</p>
                         ) : (
                             <>
-                                <p className="mt-2 text-small text-border">Selecione uma barra para consultar o desempenho. Apenas quizzes com respostas são exibidos.</p>
                                 <ul className="sr-only">
-                                    {chartData.map((quiz) => <li key={quiz.quizId}>{quiz.title}: {formatScore(quiz.average)}</li>)}
+                                    {chartData.map((quiz) => (
+                                        <li key={quiz.quizId}>{quiz.title}: {quiz.approved} aprovados e {quiz.notApproved} não aprovados.</li>
+                                    ))}
                                 </ul>
-                                <BarChart responsive accessibilityLayer data={chartData} layout="vertical" style={{ width: "100%", height: Math.max(280, chartData.length * 64) }} margin={{ top: 16, right: 48, bottom: 8, left: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                    <XAxis type="number" domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} tickFormatter={formatScore} tick={{ fontSize: 12 }} />
-                                    <YAxis type="category" dataKey="title" width={130} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(title: string) => title.length > 18 ? `${title.slice(0, 18)}...` : title} />
-                                    <Tooltip formatter={(value) => formatScore(Number(value))} />
-                                    <Bar dataKey="average" name="Média" fill="#3C3295" radius={[0, 4, 4, 0]} maxBarSize={42} isAnimationActive={false} className="cursor-pointer" onClick={(data) => navigate(`/quiz/${data.payload.quizId}/performance`)}>
-                                        <LabelList dataKey="average" position="right" fontSize={12} formatter={(value) => formatScore(Number(value))} />
+                                <BarChart responsive accessibilityLayer data={chartData} style={{ width: "100%", height: 320 }} margin={{ top: 16, right: 24, bottom: 8, left: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis type="category" dataKey="title" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(title: string) => title.length > 18 ? `${title.slice(0, 18)}...` : title} />
+                                    <YAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} />
+                                    <Tooltip formatter={(value) => Number(value).toLocaleString("pt-BR")} />
+                                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                                    <Bar dataKey="approved" name="Aprovados" stackId="results" fill="#3C3295" maxBarSize={42} isAnimationActive={false}>
+                                        <LabelList dataKey="approved" position="inside" fill="white" fontSize={12} formatter={(value) => Number(value) > 0 ? Number(value).toLocaleString("pt-BR") : ""} />
+                                    </Bar>
+                                    <Bar dataKey="notApproved" name="Não aprovados" stackId="results" fill="#2563eb" maxBarSize={42} isAnimationActive={false}>
+                                        <LabelList dataKey="notApproved" position="inside" fill="white" fontSize={12} formatter={(value) => Number(value) > 0 ? Number(value).toLocaleString("pt-BR") : ""} />
                                     </Bar>
                                 </BarChart>
                             </>

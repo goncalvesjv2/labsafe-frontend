@@ -37,7 +37,11 @@ function getLatestAttempts(attempts: IAttempt[]) {
 function getAverageScore(attempts: IAttempt[]) {
     if (attempts.length === 0) return 0;
     const totalScore = attempts.reduce((total, attempt) => total + attempt.score, 0);
-    return totalScore / attempts.length;
+    return totalScore / attempts.length / 10;
+}
+
+function formatScore(value: number) {
+    return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
 function formatPercentage(value: number) {
@@ -154,7 +158,7 @@ function TeacherDashboard() {
                                 <h2 className="text-normal font-bold">Média das notas</h2>
                                 <ChartColumn size={24} className="shrink-0 text-primary" />
                             </div>
-                            <p className="mt-3 text-3xl font-bold text-primary">{latestAttempts.length > 0 ? formatPercentage(averageScore) : "—"}</p>
+                            <p className="mt-3 text-3xl font-bold text-primary">{latestAttempts.length > 0 ? formatScore(averageScore) : "—"}</p>
                         </Card>
                         <Card className="min-w-0">
                             <div className="flex items-center justify-between gap-2">
@@ -178,15 +182,15 @@ function TeacherDashboard() {
                             <>
                                 <p className="mt-2 text-small text-border">Selecione uma barra para consultar o desempenho. Apenas quizzes com respostas são exibidos.</p>
                                 <ul className="sr-only">
-                                    {chartData.map((quiz) => <li key={quiz.quizId}>{quiz.title}: {formatPercentage(quiz.average)}</li>)}
+                                    {chartData.map((quiz) => <li key={quiz.quizId}>{quiz.title}: {formatScore(quiz.average)}</li>)}
                                 </ul>
                                 <BarChart responsive accessibilityLayer data={chartData} layout="vertical" style={{ width: "100%", height: Math.max(280, chartData.length * 64) }} margin={{ top: 16, right: 48, bottom: 8, left: 0 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                    <XAxis type="number" domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={formatPercentage} tick={{ fontSize: 12 }} />
+                                    <XAxis type="number" domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} tickFormatter={formatScore} tick={{ fontSize: 12 }} />
                                     <YAxis type="category" dataKey="title" width={130} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(title: string) => title.length > 18 ? `${title.slice(0, 18)}...` : title} />
-                                    <Tooltip formatter={(value) => formatPercentage(Number(value))} />
+                                    <Tooltip formatter={(value) => formatScore(Number(value))} />
                                     <Bar dataKey="average" name="Média" fill="#3C3295" radius={[0, 4, 4, 0]} maxBarSize={42} isAnimationActive={false} className="cursor-pointer" onClick={(data) => navigate(`/quiz/${data.payload.quizId}/performance`)}>
-                                        <LabelList dataKey="average" position="right" fontSize={12} formatter={(value) => formatPercentage(Number(value))} />
+                                        <LabelList dataKey="average" position="right" fontSize={12} formatter={(value) => formatScore(Number(value))} />
                                     </Bar>
                                 </BarChart>
                             </>

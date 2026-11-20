@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { GraduationCap, Users, UserRoundCheck, ShieldCheck } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, LabelList, Tooltip, XAxis, YAxis } from "recharts";
 import Card from "../components/Card";
 import Select from "../components/Select";
 import Title from "../components/Title";
@@ -10,6 +11,8 @@ import { mapUserRole, userRole } from "../utils/user";
 function AdminDashboard() {
     const [users, setUsers] = useState<IUsers[]>([]);
     const [selectedStatus, setSelectedStatus] = useState("all");
+    const [currentYear] = useState(() => new Date().getFullYear());
+    const [selectedYear, setSelectedYear] = useState(currentYear);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -57,6 +60,23 @@ function AdminDashboard() {
     const totalTeachers = filteredUsers.filter((user) => mapUserRole(user.role) === userRole.PROFESSOR).length;
     const totalStudents = filteredUsers.filter((user) => mapUserRole(user.role) === userRole.ALUNO).length;
 
+    const datedUsers = users.filter((user) => user.createdAt && !Number.isNaN(new Date(user.createdAt).getTime()));
+    const usersWithoutDate = users.length - datedUsers.length;
+    const years = [currentYear];
+
+    for (const user of datedUsers) {
+        const year = new Date(user.createdAt || "").getFullYear();
+        if (!years.includes(year)) years.push(year);
+    }
+    years.sort((first, second) => second - first);
+
+    const usersInYear = datedUsers.filter((user) => new Date(user.createdAt || "").getFullYear() === selectedYear);
+    const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const chartData = months.map((month, index) => ({
+        month,
+        total: usersInYear.filter((user) => new Date(user.createdAt || "").getMonth() === index).length
+    }));
+
     return (
         <>
             <Title>Dashboard</Title>
@@ -103,6 +123,39 @@ function AdminDashboard() {
                             <p className="mt-3 text-3xl font-bold text-primary">{totalStudents.toLocaleString("pt-BR")}</p>
                         </Card>
                     </div>
+                    <Card className="min-w-0 mt-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <h2 className="text-normal font-bold">Cadastros por mês</h2>
+                            <div className="flex items-center gap-2">
+                                <label htmlFor="dashboard-year" className="text-small font-bold">Ano</label>
+                                <Select id="dashboard-year" value={selectedYear} onChange={(event) => setSelectedYear(Number(event.target.value))}>
+                                    {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                                </Select>
+                            </div>
+                        </div>
+                        <p className="mt-2 text-small text-border">Considera usuários atualmente cadastrados com data de cadastro conhecida.</p>
+                        {usersWithoutDate > 0 && (
+                            <p className="mt-2 text-small text-border">{usersWithoutDate} usuários sem data de cadastro não entram no gráfico.</p>
+                        )}
+                        {usersInYear.length === 0 ? (
+                            <p role="status" className="mt-4 text-small">Nenhum usuário com data de cadastro conhecida neste ano.</p>
+                        ) : (
+                            <>
+                                <ul className="sr-only">
+                                    {chartData.map((item) => <li key={item.month}>{item.month}: {item.total} cadastros.</li>)}
+                                </ul>
+                                <BarChart responsive accessibilityLayer data={chartData} style={{ width: "100%", height: 320 }} margin={{ top: 24, right: 16, bottom: 8, left: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                                    <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                                    <Tooltip formatter={(value) => Number(value).toLocaleString("pt-BR")} />
+                                    <Bar dataKey="total" name="Cadastros" fill="#3C3295" radius={[4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
+                                        <LabelList dataKey="total" position="top" fontSize={12} formatter={(value) => Number(value) > 0 ? Number(value).toLocaleString("pt-BR") : ""} />
+                                    </Bar>
+                                </BarChart>
+                            </>
+                        )}
+                    </Card>
                 </>
             )}
         </>

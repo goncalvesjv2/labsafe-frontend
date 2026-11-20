@@ -5,4 +5,5 @@ export interface IUsers {
     role: string;
     ativo: boolean;
     hasPassword?: boolean;
+    createdAt?: string | null;
 }

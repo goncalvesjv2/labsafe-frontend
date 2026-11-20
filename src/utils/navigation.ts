@@ -1,4 +1,4 @@
-import { Users, User, LayoutDashboard, SquareText, ClipboardList, FlaskConical, type LucideIcon } from "lucide-react";
+import { Users, User, LayoutDashboard, SquareText, ClipboardList, FlaskConical, ScrollText, type LucideIcon } from "lucide-react";
 import { userRole, type UserRole } from "./user";
 
 interface MenuItem {
@@ -11,6 +11,7 @@ export const menusByRole = {
     [userRole.ADMIN]: [
         { text: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
         { text: "Usuários", path: "/users", icon: Users },
+        { text: "Auditoria", path: "/audit", icon: ScrollText },
         { text: "Perfil", path: "/profile", icon: User },
     ],
     [userRole.PROFESSOR]: [

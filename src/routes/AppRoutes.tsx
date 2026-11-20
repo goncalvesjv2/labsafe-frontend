@@ -29,6 +29,7 @@ import ViewQuiz from "../pages/ViewQuiz";
 import QuizPerformance from "../pages/QuizPerformance";
 import Profile from "../pages/Profile";
 import UserProfile from "../pages/UserProfile";
+import Logs from "../pages/Logs";
 
 const NotFound = lazy(() => import("../pages/NotFound"));
 
@@ -51,6 +52,7 @@ function AppRoutes() {
                         <Route path="/dashboard" element={<Dashboard />} />
                     </Route>
                     <Route element={<AdminRoutes />}>
+                        <Route path="/audit" element={<Logs />} />
                         <Route path="/profile/:id" element={<UserProfile />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/users/create" element={<CreateUser />} />

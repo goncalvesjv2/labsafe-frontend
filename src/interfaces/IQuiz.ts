@@ -2,6 +2,7 @@ export interface IQuiz {
     id: number;
     contentId: number;
     teacherId: number;
+    createdAt?: string | null;
 }
 
 export interface IQuestion {

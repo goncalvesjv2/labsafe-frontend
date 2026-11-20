@@ -20,13 +20,13 @@ function Sidebar({name, role}: SidebarProps) {
     }
 
     return (
-        <aside className="bg-primary h-full w-3xs shrink-0 flex flex-col justify-between p-4">
-            <div className="flex items-center gap-2">
+        <aside className="bg-primary h-full w-3xs shrink-0 flex flex-col justify-between gap-6 overflow-y-auto overscroll-contain p-4">
+            <div className="flex shrink-0 items-center gap-2">
                 <img src={logo} className="w-8 h-8" alt="Logo da LabSafe" />
                 <p className="text-white text-title">LabSafe</p>
             </div>
 
-            <nav>
+            <nav className="shrink-0">
                 <ul className="text-white flex flex-col gap-8">
                     {menu.map((item) => {
                         const Icon = item.icon;
@@ -43,7 +43,7 @@ function Sidebar({name, role}: SidebarProps) {
                 </ul>
             </nav>
             
-            <div>
+            <div className="shrink-0">
                 <div className="flex gap-2 items-center">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-white rounded-full" aria-hidden="true">
                         <UserRound size={20} className="text-border" />

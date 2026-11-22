@@ -67,8 +67,14 @@ function Login() {
     }
 
     return (
-        <div className="h-screen bg-primary flex flex-col justify-center items-center">
-            <Card className="w-md h-min">
+        <div className="min-h-screen bg-primary flex flex-col justify-center items-center gap-8 p-4">
+            <header className="max-w-xl text-center text-white">
+                <h1 className="text-4xl font-bold">LabSafe</h1>
+                <p className="mt-2 text-normal">
+                    Sistema de treinamento e capacitação em segurança laboratorial
+                </p>
+            </header>
+            <Card className="w-full max-w-md h-min">
                 <form onSubmit={handleSubmit(handleLogin, handleInvalidSubmit)} noValidate className="flex flex-col gap-4">
                     <FormField label="E-mail:" htmlFor="login-email" className="text-black text-small">
                         <Input id="login-email" {...register("email", {

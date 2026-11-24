@@ -84,7 +84,6 @@ function Reagent() {
             {compound && (
                 <div className="flex justify-center">
                     <Card className="mt-8 flex flex-col gap-4">
-                        <p><strong>CID:</strong> {compound.cid}</p>
                         <p><strong>Nome:</strong> {compound.title}</p>
                         <p><strong>Fórmula molecular:</strong> {compound.molecularFormula}</p>
                         <p><strong>Peso molecular:</strong> {compound.molecularWeight}</p>

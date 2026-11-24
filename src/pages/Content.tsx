@@ -99,7 +99,9 @@ function Content() {
     return (
         <>
             <Title>Conteúdo</Title>
-            <p className="text-normal text-border font-bold">Crie um conteúdo contendo título e descrição</p>
+            {user?.role === userRole.PROFESSOR && (
+                <p className="text-normal text-border font-bold">Crie um conteúdo contendo título e descrição</p>
+            )}
             {user?.role === userRole.PROFESSOR && (
                 <div className="flex justify-end mt-4">
                     <Button onClick={handleCreate}>
